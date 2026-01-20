@@ -5,4 +5,4 @@ Data includes:
 - All group data
 - All governor data
 
-
+The data has been compressed into a zip file as the uncompressed files exceeded GitHub's file size hosting limit (100MB)
