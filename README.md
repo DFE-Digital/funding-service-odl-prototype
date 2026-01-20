@@ -1,16 +1,6 @@
-# Funding Service ODL Prototype
-
- A collection of prototypes and mock-ups relating to the ODL (Operational Data Layer) work. 
+# Funding Service Operational Data Layer Prototype
+This repository contains the source code for the Funding Service ODL (Operational Data Layer) prototype, including infra, backend code, and a UI prototype.
 
 ## Using the prototype
 
-You can [learn how to use the Prototype Kit on GOV.UK](https://prototype-kit.service.gov.uk/docs/).
-
-To run the prototype:
-- Open this repository with GitHub Desktop or a similar tool
-- Open the prototype code in an editor such as [Visual Studio Code](https://code.visualstudio.com/)
-- To get the kit up and running on your machine, in your terminal you should run:
-```
-npm install
-npm run dev
-```
+Refer to [prototype/README.md](./prototype/README.md) for guidance on using the prototype.
