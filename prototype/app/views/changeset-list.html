@@ -1,0 +1,75 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+Changesets – {{ serviceName }} – GOV.UK Prototype Kit
+{% endblock %}
+
+{% block content %}
+
+<h1 class="govuk-heading-l">Changesets</h1>
+
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+      <a class="govuk-tabs__tab" href="#open">
+        Open
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#deployed">
+        Deployed
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#draft">
+        Draft
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item">
+      <a class="govuk-tabs__tab" href="#closed">
+        Closed
+      </a>
+    </li>
+  </ul>
+  <div class="govuk-tabs__panel" id="open">
+    <h2 class="govuk-heading-l">Open (1)</h2>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">ID</th>
+          <th scope="col" class="govuk-table__header">Title</th>
+          <th scope="col" class="govuk-table__header">Author</th>
+          <th scope="col" class="govuk-table__header">Date Opened</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">000001</td>
+          <td class="govuk-table__cell"><a href="/changeset-mvp">Changes to Newcastle schools</a></td>
+          <td class="govuk-table__cell"><a href="mailto:aaron.yarborough@education.gov.uk">Aaron Yarborough</a></td>
+          <td class="govuk-table__cell">20th January 2026, 16:00</td>
+        </tr>
+       
+      </tbody>
+    </table>
+  </div>
+
+  <div class="govuk-tabs__panel" id="deployed">
+    <h2 class="govuk-heading-l">Deployed (0)</h2>
+    
+  </div>
+
+  <div class="govuk-tabs__panel" id="draft">
+    <h2 class="govuk-heading-l">Draft (0)</h2>
+    
+  </div>
+
+  <div class="govuk-tabs__panel" id="closed">
+    <h2 class="govuk-heading-l">Closed (0)</h2>
+  </div>
+
+
+  
+</div>
+
+{% endblock %}
