@@ -4,9 +4,10 @@ from getResponses import url as getResponses_url
 from getResponseQuestion import url as getResponseQuestion_url
 from getResponseQuestionData import url as getResponseQuestionData_url
 
-class get_DF:
+class GetDF:
     def __init__(self,start_date,end_date,form_id):
-        self.startdate = start_date
+
+        self.start_date = start_date
         self.enddate = end_date
         self.formid = form_id
         self.listFormConfigurations_pattern = ['Cookie']
@@ -26,11 +27,52 @@ class get_DF:
         payload = {}
 
         headers_structure = dict(zip(API_options,[self.listFormConfigurations_pattern,self.getResponses_pattern,self.getResponseQuestion_pattern,self.getResponseQuestionData_pattern]))
-        headers_arguments = dict(zip(['StartDate','FormId','EndDate','Cookie'],[self.startdate,self.formid,self.enddate,cookie]))
+        headers_arguments = dict(zip(['StartDate','FormId','EndDate','Cookie'],[self.start_date,self.formid,self.enddate,cookie]))
 
+        headers_structures = []
+        #becomes a list of lists
         for API in APIs:
-            headers_arguments[headers_structure[API]]
-            
-        response = requests.request("GET", url, headers=headers, data=payload)
-        return response.text
+            headers_structures.append(headers_structure[API])
+        
+        #print(headers_structures)
+        
+        arguments = []
+        #becomes a list of lists with the actual instantiated header arguments for each API submitted
+        #it will be in the order that the APIs were submitted, not the API_options order
+        #for instance:
+        #[['Cookie'], ['StartDate', 'FormId', 'EndDate', 'Cookie'], ['StartDate', 'FormId', 'EndDate', 'Cookie'], ['StartDate', 'FormId', 'EndDate']]
+        for i in range(0,len(headers_structures)):
+            arguments.append([])
+            for argument in headers_structures[i]:
+                arguments[-1].append(headers_arguments[argument])
+
+        #print(arguments)
+
+        #Now need to make dictionaries where headers_structures are the keys and arguments are the values
+        headers_list = [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
+        #print(headers_list)
+
+        #Now to get the URLs in a list
+        URLs = []
+        for API in APIs:
+            if API == 'listFormConfigurations':
+                URLs.append(listFormConfigurations_url)
+            if API == 'getResponses':
+                URLs.append(getResponses_url)
+            if API == 'getResponseQuestion':
+                URLs.append(getResponseQuestion_url)
+            if API == 'getResponseQuestionData':
+                URLs.append(getResponseQuestionData_url)
+
+        
+        response_data = []
+        for i in range(0,len(APIs)):
+            response_data.append(requests.request("GET", URLs[i], headers=headers_list[i], data=payload).text)
+
+
+  
+        return response_data
     
+ 
+instance = GetDF('2026-05-05','2026-06-20','7c6iy7ajyi')
+print(instance.get('listFormConfigurations','getResponses','getResponseQuestion','getResponseQuestionData'))
