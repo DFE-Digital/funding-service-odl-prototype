@@ -68,6 +68,19 @@ node_modules/
 migrate.log
 usage-data-config.json
 
+### VisualStudioCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+
 # General ignores
 .DS_Store
 .idea
+.venv/
+.dolt/
+.doltcfg/
+.dolt-linux-amd64
