@@ -13,9 +13,9 @@ class GetDF:
         self.start_date = start_date
         self.end_date = end_date
         self.form_id = form_id
-        self.listFormConfigurations_pattern = ['Cookie']
-        self.getResponses_pattern = ['StartDate','FormId','EndDate','Cookie']
-        self.getResponseQuestion_pattern = ['StartDate','FormId','EndDate','Cookie']
+        self.listFormConfigurations_pattern = []
+        self.getResponses_pattern = ['StartDate','FormId','EndDate']
+        self.getResponseQuestion_pattern = ['StartDate','FormId','EndDate']
         self.getResponseQuestionData_pattern = ['StartDate','FormId','EndDate']
     
     """Data from the 4 APIs can be retrieved by calling an instance of this
@@ -37,19 +37,9 @@ class GetDF:
                                      self.getResponseQuestionData_pattern]))
     
     def headers_list(self,headers_structure,*apis):
-
-        cookie = 'BNIS___utm_is1=iOhL/yEZovIFKNeArS2Ynm5E3krDMFhhvawqqwn2BZr' \
-        'Mdhp74duH9QnEwKgLqRDD2jp24zCpTEnersbm4bjSqMyArkI+wBxiHhuvWFW6NI9n1I' \
-        'f+pzqsaQ==; BNIS___utm_is2=EFgCQgAaEXLw3hLzBng+v7njvN2G4iIoK/xrcILL' \
-        'EN+g1qm3fc0KZl09WWDch//pR2i8825+pJ4=; BNIS___utm_is3=suvQyLhFSyq+S/' \
-        'jbW+6/0rIkJkC7MiJY4aaGmwjfZ0WIjM90rJEYcAIsnJQevrfkQI0J3asCYACYu6pY1' \
-        'ExffF5yqOKiuYQl0JOeIzZ3wuk=; BNIS_vid=Y8C70dUv6TGhd5aLcDn3BOsAXv50S' \
-        'eMUvz/pmhbyZidvnKTMmQ2Xz21a+yyIXrdcTNx5HiChFu1kjEcapg5ztb8CEUF9V8VN' \
-        'KVUttfAaVns='
         
-        headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate', 'Cookie'],
-                                     [self.start_date, self.form_id, self.end_date,
-                                      cookie]))
+        headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate'],
+                                     [self.start_date, self.form_id, self.end_date]))
 
         headers_structures = []
         #headers_structures becomes a list of lists.
@@ -103,5 +93,8 @@ class GetDF:
     
  
 instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi')
-print(instance('listFormConfigurations', 'getResponses',
-                   'getResponseQuestion', 'getResponseQuestionData'))
+instance_call = instance('listFormConfigurations', 'getResponses',
+                   'getResponseQuestion', 'getResponseQuestionData')
+
+for api in instance_call:
+    print(len(api))
