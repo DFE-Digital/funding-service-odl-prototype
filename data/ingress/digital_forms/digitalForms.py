@@ -1,8 +1,9 @@
 import requests
-from listFormConfigurations import url as listFormConfigurations_url
-from getResponses import url as getResponses_url
-from getResponseQuestion import url as getResponseQuestion_url
-from getResponseQuestionData import url as getResponseQuestionData_url
+
+listFormConfigurations_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/listFormConfigurations"
+getResponses_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/getResponses"
+getResponseQuestion_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/getResponseQuestion"
+getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/getResponseQuestionData"
 
 class GetDF:
     """This class can be instantiated with the required arguments to filter
