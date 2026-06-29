@@ -21,9 +21,13 @@ python /home/smapplebeck/odl-prototype/prototype/app/data/GIAS_ingestion.py
 # Get exit status of python script
 SCRIPT_STATUS=$?
 
-# Kill the background Dolt instance
+# Kill the background Dolt instance if still running
 echo "Stopping Dolt Server..."
-kill $DOLT_PID
+if kill -0 $DOLT_PID 2>/dev/null; then
+    kill $DOLT_PID
+else
+    echo "Dolt server already stopped."
+fi
 
 # Exit with same status as python script
 exit $SCRIPT_STATUS

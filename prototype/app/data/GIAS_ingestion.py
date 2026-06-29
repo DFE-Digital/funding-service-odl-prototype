@@ -36,7 +36,7 @@ engine = create_engine(DOLT_CONN)
 #Keep log of any failed datasets
 failed_datasets={}
 
-for _, (DATASET, TABLE_NAME) in enumerate(DATASETS_TABLE_NAMES.items()):
+for DATASET, TABLE_NAME in DATASETS_TABLE_NAMES.items():
     print(f"\nProcessing Dataset: {DATASET}:")
     try:
         # # Build url
@@ -85,11 +85,12 @@ try:
     
     with engine.connect() as conn:
         conn.execute(text("CALL DOLT_ADD('-A');"))
+        # allow empty commit if data hasn;t changed to maintain log 
         conn.execute(
-            text("CALL DOLT_COMMIT('-m', :msg);"), 
+            text("CALL DOLT_COMMIT('--allow-empty', '-m', :msg);"), 
             {"msg": commit_message}
         )
-        
+                
     print("Successfully commited GIAS data to Dolt")
 
 except Exception as e:
