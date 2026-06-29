@@ -17,8 +17,6 @@ class GetDF:
         self.getResponseQuestion_pattern = ['StartDate','FormId','EndDate','Cookie']
         self.getResponseQuestionData_pattern = ['StartDate','FormId','EndDate']
     
-
-    
     def get(self,*apis):
         """This instance method can be called with a subset or all 4 Digital
         Forms APIs, using the arbitrary positional arguments parameter (*APIs)
@@ -49,18 +47,16 @@ class GetDF:
                                       cookie]))
 
         headers_structures = []
-        #becomes a list of lists
+        #headers_structures becomes a list of lists.
         for api in apis:
             headers_structures.append(headers_structure[api])
         
-        #print(headers_structures)
-        
         arguments = []
-        #becomes a list of lists with the actual instantiated header arguments
-        #for each API submitted
-        #it will be in the order that the APIs were submitted, not the
-        #API_options order
-        #for instance:
+        #arguments becomes a list of lists with the actual instantiated header
+        # arguments for each API submitted.
+        #It will be in the order that the apis were submitted, not the
+        # api_options order.
+        #For instance:
         #[['Cookie'], ['StartDate', 'FormId', 'EndDate', 'Cookie'],
         # ['StartDate', 'FormId', 'EndDate', 'Cookie'],
         # ['StartDate', 'FormId', 'EndDate']]
@@ -69,14 +65,11 @@ class GetDF:
             for argument in headers_structures[i]:
                 arguments[-1].append(headers_arguments[argument])
 
-        #print(arguments)
-
-        #Now need to make dictionaries where headers_structures are the keys
-        #and arguments are the values
+        #headers_list is a dictionary where headers_structures are the keys
+        # and arguments are the values.
         headers_list = [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
-        #print(headers_list)
 
-        #Now to get the URLs in a list
+        #urls is a list of endpoints.
         urls = []
         for api in apis:
             if api == 'listFormConfigurations':
@@ -88,15 +81,12 @@ class GetDF:
             if api == 'getResponseQuestionData':
                 urls.append(getResponseQuestionData_url)
 
-        
         response_data = []
         for i in range(0,len(apis)):
             response_data.append(requests.request("GET", urls[i],
                                                   headers=headers_list[i],
                                                   data=payload).text)
 
-
-  
         return response_data
     
  
