@@ -19,8 +19,8 @@ class GetDF:
         self.getResponseQuestionData_pattern = ['StartDate','FormId','EndDate']
     
     """Data from the 4 APIs can be retrieved by calling an instance of this
-    class."""
-    def __call__(self,*apis):
+    class. Change this now."""
+    def headers_structure(self,*apis):
         """This instance method can be called with a subset or all 4 Digital
         Forms APIs, using the arbitrary positional arguments parameter (*APIs)
         to retrieve the data"""
@@ -28,9 +28,16 @@ class GetDF:
                        'getResponseQuestion', 'getResponseQuestionData']
         for submit in apis:
             if submit not in api_options:
-                raise ValueError(f"Unsupported API name. Enter" \
+                raise ValueError(f"Unsupported API name. Enter " \
                                  "one or more of the following: {api_options}")
-        
+
+        return dict(zip(api_options,[self.listFormConfigurations_pattern,
+                                     self.getResponses_pattern,
+                                     self.getResponseQuestion_pattern,
+                                     self.getResponseQuestionData_pattern]))
+    
+    def headers_list(self,headers_structure,*apis):
+
         cookie = 'BNIS___utm_is1=iOhL/yEZovIFKNeArS2Ynm5E3krDMFhhvawqqwn2BZr' \
         'Mdhp74duH9QnEwKgLqRDD2jp24zCpTEnersbm4bjSqMyArkI+wBxiHhuvWFW6NI9n1I' \
         'f+pzqsaQ==; BNIS___utm_is2=EFgCQgAaEXLw3hLzBng+v7njvN2G4iIoK/xrcILL' \
@@ -39,12 +46,7 @@ class GetDF:
         'ExffF5yqOKiuYQl0JOeIzZ3wuk=; BNIS_vid=Y8C70dUv6TGhd5aLcDn3BOsAXv50S' \
         'eMUvz/pmhbyZidvnKTMmQ2Xz21a+yyIXrdcTNx5HiChFu1kjEcapg5ztb8CEUF9V8VN' \
         'KVUttfAaVns='
-        payload = {}
-
-        headers_structure = dict(zip(api_options,[self.listFormConfigurations_pattern,
-                                                  self.getResponses_pattern,
-                                                  self.getResponseQuestion_pattern,
-                                                  self.getResponseQuestionData_pattern]))
+        
         headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate', 'Cookie'],
                                      [self.start_date, self.form_id, self.end_date,
                                       cookie]))
@@ -52,7 +54,7 @@ class GetDF:
         headers_structures = []
         #headers_structures becomes a list of lists.
         for api in apis:
-            headers_structures.append(headers_structure[api])
+            headers_structures.append(headers_structure(*apis)[api])
         
         arguments = []
         #arguments becomes a list of lists with the actual instantiated header
@@ -70,7 +72,9 @@ class GetDF:
 
         #headers_list is a dictionary where headers_structures are the keys
         # and arguments are the values.
-        headers_list = [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
+        return [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
+    
+    def urls(self,*apis):
 
         #urls is a list of endpoints.
         urls = []
@@ -83,14 +87,19 @@ class GetDF:
                 urls.append(getResponseQuestion_url)
             if api == 'getResponseQuestionData':
                 urls.append(getResponseQuestionData_url)
-
+        
+        return urls
+    
+    def __call__(self,*apis):
         response_data = []
+        payload = {}
         for i in range(0,len(apis)):
-            response_data.append(requests.request("GET", urls[i],
-                                                  headers=headers_list[i],
-                                                  data=payload).text)
-
+            response_data.append(requests.request("GET", self.urls(*apis)[i],
+                                                  headers = self.headers_list(self.headers_structure,*apis)[i],
+                                                  data = payload).text)
         return response_data
+    
+    
     
  
 instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi')
