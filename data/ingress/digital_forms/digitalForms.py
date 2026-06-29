@@ -19,16 +19,16 @@ class GetDF:
     
 
     
-    def get(self,*APIs):
+    def get(self,*apis):
         """This instance method can be called with a subset or all 4 Digital
         Forms APIs, using the arbitrary positional arguments parameter (*APIs)
         to retrieve the data"""
-        API_options = ['listFormConfigurations','getResponses',
-                       'getResponseQuestion','getResponseQuestionData']
-        for submit in APIs:
-            if submit not in API_options:
+        api_options = ['listFormConfigurations', 'getResponses',
+                       'getResponseQuestion', 'getResponseQuestionData']
+        for submit in apis:
+            if submit not in api_options:
                 raise ValueError(f"Unsupported API name. Enter" \
-                                 "one or more of the following: {API_options}")
+                                 "one or more of the following: {api_options}")
         
         cookie = 'BNIS___utm_is1=iOhL/yEZovIFKNeArS2Ynm5E3krDMFhhvawqqwn2BZr' \
         'Mdhp74duH9QnEwKgLqRDD2jp24zCpTEnersbm4bjSqMyArkI+wBxiHhuvWFW6NI9n1I' \
@@ -40,18 +40,18 @@ class GetDF:
         'KVUttfAaVns='
         payload = {}
 
-        headers_structure = dict(zip(API_options,[self.listFormConfigurations_pattern,
+        headers_structure = dict(zip(api_options,[self.listFormConfigurations_pattern,
                                                   self.getResponses_pattern,
                                                   self.getResponseQuestion_pattern,
                                                   self.getResponseQuestionData_pattern]))
-        headers_arguments = dict(zip(['StartDate','FormId','EndDate','Cookie'],
-                                     [self.start_date,self.formid,self.enddate,
+        headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate', 'Cookie'],
+                                     [self.start_date, self.formid, self.enddate,
                                       cookie]))
 
         headers_structures = []
         #becomes a list of lists
-        for API in APIs:
-            headers_structures.append(headers_structure[API])
+        for api in apis:
+            headers_structures.append(headers_structure[api])
         
         #print(headers_structures)
         
@@ -77,21 +77,21 @@ class GetDF:
         #print(headers_list)
 
         #Now to get the URLs in a list
-        URLs = []
-        for API in APIs:
-            if API == 'listFormConfigurations':
-                URLs.append(listFormConfigurations_url)
-            if API == 'getResponses':
-                URLs.append(getResponses_url)
-            if API == 'getResponseQuestion':
-                URLs.append(getResponseQuestion_url)
-            if API == 'getResponseQuestionData':
-                URLs.append(getResponseQuestionData_url)
+        urls = []
+        for api in apis:
+            if api == 'listFormConfigurations':
+                urls.append(listFormConfigurations_url)
+            if api == 'getResponses':
+                urls.append(getResponses_url)
+            if api == 'getResponseQuestion':
+                urls.append(getResponseQuestion_url)
+            if api == 'getResponseQuestionData':
+                urls.append(getResponseQuestionData_url)
 
         
         response_data = []
-        for i in range(0,len(APIs)):
-            response_data.append(requests.request("GET", URLs[i],
+        for i in range(0,len(apis)):
+            response_data.append(requests.request("GET", urls[i],
                                                   headers=headers_list[i],
                                                   data=payload).text)
 
@@ -100,6 +100,6 @@ class GetDF:
         return response_data
     
  
-instance = GetDF('2026-05-05','2026-06-20','7c6iy7ajyi')
-print(instance.get('listFormConfigurations','getResponses',
-                   'getResponseQuestion','getResponseQuestionData'))
+instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi')
+print(instance.get('listFormConfigurations', 'getResponses',
+                   'getResponseQuestion', 'getResponseQuestionData'))
