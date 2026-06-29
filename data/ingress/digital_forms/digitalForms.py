@@ -10,14 +10,16 @@ class GetDF:
     def __init__(self,start_date,end_date,form_id):
 
         self.start_date = start_date
-        self.enddate = end_date
-        self.formid = form_id
+        self.end_date = end_date
+        self.form_id = form_id
         self.listFormConfigurations_pattern = ['Cookie']
         self.getResponses_pattern = ['StartDate','FormId','EndDate','Cookie']
         self.getResponseQuestion_pattern = ['StartDate','FormId','EndDate','Cookie']
         self.getResponseQuestionData_pattern = ['StartDate','FormId','EndDate']
     
-    def get(self,*apis):
+    """Data from the 4 APIs can be retrieved by calling an instance of this
+    class."""
+    def __call__(self,*apis):
         """This instance method can be called with a subset or all 4 Digital
         Forms APIs, using the arbitrary positional arguments parameter (*APIs)
         to retrieve the data"""
@@ -43,7 +45,7 @@ class GetDF:
                                                   self.getResponseQuestion_pattern,
                                                   self.getResponseQuestionData_pattern]))
         headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate', 'Cookie'],
-                                     [self.start_date, self.formid, self.enddate,
+                                     [self.start_date, self.form_id, self.end_date,
                                       cookie]))
 
         headers_structures = []
@@ -91,5 +93,5 @@ class GetDF:
     
  
 instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi')
-print(instance.get('listFormConfigurations', 'getResponses',
+print(instance('listFormConfigurations', 'getResponses',
                    'getResponseQuestion', 'getResponseQuestionData'))
