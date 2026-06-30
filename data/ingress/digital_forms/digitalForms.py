@@ -8,15 +8,15 @@ getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.educati
 class GetDF:
     """This class can be instantiated with the required arguments to filter
     data across the 4 Digital Forms APIs."""
-    def __init__(self,start_date,end_date,form_id):
+    def __init__(self,start_date,end_date,*form_id):
 
         self.start_date = start_date
         self.end_date = end_date
         self.form_id = form_id
         self.listFormConfigurations_pattern = []
-        self.getResponses_pattern = ['StartDate','FormId','EndDate']
-        self.getResponseQuestion_pattern = ['StartDate','FormId','EndDate']
-        self.getResponseQuestionData_pattern = ['StartDate','FormId','EndDate']
+        self.getResponses_pattern = ['StartDate','EndDate','FormId']
+        self.getResponseQuestion_pattern = ['StartDate','EndDate','FormId']
+        self.getResponseQuestionData_pattern = ['StartDate','EndDate','FormId']
     
     """Data from the 4 APIs can be retrieved by calling an instance of this
     class. Change this now."""
@@ -36,10 +36,10 @@ class GetDF:
                                      self.getResponseQuestion_pattern,
                                      self.getResponseQuestionData_pattern]))
     
-    def headers_list(self,headers_structure,*apis):
+    def headers_list(self,headers_structure,form_id,*apis):
         
-        headers_arguments = dict(zip(['StartDate', 'FormId', 'EndDate'],
-                                     [self.start_date, self.form_id, self.end_date]))
+        headers_arguments = dict(zip(['StartDate', 'EndDate', 'FormId'],
+                                     [self.start_date, self.end_date, form_id]))
 
         headers_structures = []
         #headers_structures becomes a list of lists.
@@ -81,20 +81,34 @@ class GetDF:
         return urls
     
     def __call__(self,*apis):
-        response_data = []
-        payload = {}
-        for i in range(0,len(apis)):
-            response_data.append(requests.request("GET", self.urls(*apis)[i],
-                                                  headers = self.headers_list(self.headers_structure,*apis)[i],
-                                                  data = payload).text)
-        return response_data
-    
+        outer_list = []
+        count = 0
+        for form in self.form_id:
+            if count == 1 and len(apis) > 1:
+                apis = [a for a in apis if a != 'listFormConfigurations']  
+            response_data = []
+            payload = {}
+            for i in range(0,len(apis)):
+                response_data.append(requests.request("GET", self.urls(*apis)[i],
+                                                      headers = self.headers_list(self.headers_structure,form,*apis)[i],
+                                                      data = payload).text)
+            outer_list.append(response_data)
+            count += 1
+        return outer_list
     
     
  
-instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi')
+instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi','i3If3JGHw8','cb7bii5gx2','o50um3ao3a','x1xtt7u3p0','_igkp1ft5_','59m0cqvlku')
 instance_call = instance('listFormConfigurations', 'getResponses',
                    'getResponseQuestion', 'getResponseQuestionData')
 
+
+
+#print(instance('listFormConfigurations'))
+
 for api in instance_call:
-    print(len(api))
+    print(type(api))
+    for i in range(0,len(api)):
+        print(len(api[i]))
+
+
