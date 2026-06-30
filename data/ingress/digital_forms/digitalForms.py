@@ -110,9 +110,7 @@ instance_call = instance('listFormConfigurations', 'getResponses',
 
 #print(instance('listFormConfigurations'))
 
-for api in instance_call:
-    print(type(api))
-    for i in range(0,len(api)):
-        print(len(api[i]))
 
-
+print(instance_call[1])
+print(len(instance_call))
+print(len(instance_call[1]))
