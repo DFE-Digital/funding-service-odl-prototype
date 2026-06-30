@@ -81,23 +81,20 @@ class GetDF:
         return urls
     
     def __call__(self,*apis):
-        outer_list = []
+        outer_list = {}
         payload = {}
         if 'listFormConfigurations' in apis:
-            outer_list.append({'listFormConfigurations' :[requests.request("GET", self.urls('listFormConfigurations')[0],
+            outer_list.update({'listFormConfigurations': requests.request("GET", self.urls('listFormConfigurations')[0],
                                                       headers = self.headers_list(self.headers_structure,self.form_id[0],'listFormConfigurations')[0],
-                                                      data = payload).text]})
+                                                      data = payload).text})
             
-        outer_list.append([])
 
         apis = [a for a in apis if a != 'listFormConfigurations'] 
         for form in self.form_id:
-            response_data = []
             for i in range(0,len(apis)):
-                response_data.append({apis[i]+"|"+form :requests.request("GET", self.urls(*apis)[i],
+                outer_list.update({apis[i]+"|"+form: requests.request("GET", self.urls(*apis)[i],
                                                       headers = self.headers_list(self.headers_structure,form,*apis)[i],
                                                       data = payload).text})
-            outer_list[1].append(response_data)
         return outer_list
     
     
@@ -111,6 +108,4 @@ instance_call = instance('listFormConfigurations', 'getResponses',
 #print(instance('listFormConfigurations'))
 
 
-print(instance_call[1])
-print(len(instance_call))
-print(len(instance_call[1]))
+print(instance_call.keys())
