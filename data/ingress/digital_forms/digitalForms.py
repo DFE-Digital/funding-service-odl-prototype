@@ -82,18 +82,22 @@ class GetDF:
     
     def __call__(self,*apis):
         outer_list = []
-        count = 0
+        payload = {}
+        if 'listFormConfigurations' in apis:
+            outer_list.append([requests.request("GET", self.urls('listFormConfigurations'),
+                                                      headers = self.headers_list(self.headers_structure,self.form_id[0],'listFormConfigurations'),
+                                                      data = payload).text])
+            
+        outer_list.append([])
+         
+        apis = [a for a in apis if a != 'listFormConfigurations'] 
         for form in self.form_id:
-            if count == 1 and len(apis) > 1:
-                apis = [a for a in apis if a != 'listFormConfigurations']  
             response_data = []
-            payload = {}
             for i in range(0,len(apis)):
                 response_data.append(requests.request("GET", self.urls(*apis)[i],
                                                       headers = self.headers_list(self.headers_structure,form,*apis)[i],
                                                       data = payload).text)
-            outer_list.append(response_data)
-            count += 1
+            outer_list[1].append(response_data)
         return outer_list
     
     
