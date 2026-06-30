@@ -84,9 +84,9 @@ class GetDF:
         outer_list = []
         payload = {}
         if 'listFormConfigurations' in apis:
-            outer_list.append([requests.request("GET", self.urls('listFormConfigurations')[0],
+            outer_list.append({'listFormConfigurations' :[requests.request("GET", self.urls('listFormConfigurations')[0],
                                                       headers = self.headers_list(self.headers_structure,self.form_id[0],'listFormConfigurations')[0],
-                                                      data = payload).text])
+                                                      data = payload).text]})
             
         outer_list.append([])
 
@@ -94,9 +94,9 @@ class GetDF:
         for form in self.form_id:
             response_data = []
             for i in range(0,len(apis)):
-                response_data.append(requests.request("GET", self.urls(*apis)[i],
+                response_data.append({apis[i]+"|"+form :requests.request("GET", self.urls(*apis)[i],
                                                       headers = self.headers_list(self.headers_structure,form,*apis)[i],
-                                                      data = payload).text)
+                                                      data = payload).text})
             outer_list[1].append(response_data)
         return outer_list
     
