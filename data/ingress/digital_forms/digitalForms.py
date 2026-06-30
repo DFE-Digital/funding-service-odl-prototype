@@ -84,12 +84,12 @@ class GetDF:
         outer_list = []
         payload = {}
         if 'listFormConfigurations' in apis:
-            outer_list.append([requests.request("GET", self.urls('listFormConfigurations'),
-                                                      headers = self.headers_list(self.headers_structure,self.form_id[0],'listFormConfigurations'),
+            outer_list.append([requests.request("GET", self.urls('listFormConfigurations')[0],
+                                                      headers = self.headers_list(self.headers_structure,self.form_id[0],'listFormConfigurations')[0],
                                                       data = payload).text])
             
         outer_list.append([])
-         
+
         apis = [a for a in apis if a != 'listFormConfigurations'] 
         for form in self.form_id:
             response_data = []
