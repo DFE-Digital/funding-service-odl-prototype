@@ -41,12 +41,9 @@ class GetDF:
         headers_arguments = dict(zip(['StartDate', 'EndDate', 'FormId'],
                                      [self.start_date, self.end_date, form_id]))
 
-        headers_structures = []
+        headers_structures = [headers_structure(*apis)[api] for api in apis]
         #headers_structures becomes a list of lists.
-        for api in apis:
-            headers_structures.append(headers_structure(*apis)[api])
         
-        arguments = []
         #arguments becomes a list of lists with the actual instantiated header
         # arguments for each API submitted.
         #It will be in the order that the apis were submitted, not the
@@ -55,10 +52,16 @@ class GetDF:
         #[['Cookie'], ['StartDate', 'FormId', 'EndDate', 'Cookie'],
         # ['StartDate', 'FormId', 'EndDate', 'Cookie'],
         # ['StartDate', 'FormId', 'EndDate']]
-        for i in range(0,len(headers_structures)):
-            arguments.append([])
-            for argument in headers_structures[i]:
-                arguments[-1].append(headers_arguments[argument])
+        
+        arguments = [
+            [headers_arguments[argument] for argument in struct]
+            for struct in headers_structures
+        ]
+        
+        print("headers_structures")
+        print(headers_structures)
+        print("arguments")
+        print(arguments)
 
         #headers_list is a dictionary where headers_structures are the keys
         # and arguments are the values.
@@ -66,17 +69,13 @@ class GetDF:
     
     def urls(self,*apis):
 
-        #urls is a list of endpoints.
-        urls = []
-        for api in apis:
-            if api == 'listFormConfigurations':
-                urls.append(listFormConfigurations_url)
-            if api == 'getResponses':
-                urls.append(getResponses_url)
-            if api == 'getResponseQuestion':
-                urls.append(getResponseQuestion_url)
-            if api == 'getResponseQuestionData':
-                urls.append(getResponseQuestionData_url)
+        """Returns a list of endpoints."""
+        url_dict = {'listFormConfigurations': listFormConfigurations_url,
+             'getResponses': getResponses_url,
+             'getResponseQuestion': getResponseQuestion_url,
+             'getResponseQuestionData': getResponseQuestionData_url}
+        
+        urls = [url_dict[api] for api in apis]
         
         return urls
     
@@ -89,12 +88,20 @@ class GetDF:
                                                       data = payload).text})
             
 
-        apis = [a for a in apis if a != 'listFormConfigurations'] 
+        apis = [a for a in apis if a != 'listFormConfigurations']
+        
         for form in self.form_id:
-            for i in range(0,len(apis)):
-                outer_list.update({apis[i]+"|"+form: requests.request("GET", self.urls(*apis)[i],
-                                                      headers = self.headers_list(self.headers_structure,form,*apis)[i],
-                                                      data = payload).text})
+            for api, url, header in zip(
+                apis,
+                self.urls(*apis),
+                self.headers_list(self.headers_structure,form,*apis)
+            ):
+                outer_list.update({form + "|" + api:
+                                   requests.request("GET", url,
+                                                      headers = header,
+                                                      data = payload).text
+                })
+                
         return outer_list
     
     
