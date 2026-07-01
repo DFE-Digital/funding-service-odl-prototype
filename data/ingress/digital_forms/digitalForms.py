@@ -52,11 +52,10 @@ class GetDF:
             [headers_arguments[argument] for argument in struct]
             for struct in headers_structures
         ] # list of lists
-        
+
         return [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
     
     def _urls(self, *apis: str):
-
         """Returns a list of endpoints."""
         url_dict = {'listFormConfigurations': listFormConfigurations_url,
              'getResponses': getResponses_url,
@@ -67,7 +66,7 @@ class GetDF:
         
         return urls
     
-    def __call__(self, *apis: str):
+    def __call__(self, *apis: str) -> dict:
         outer_list = {}
         payload = {}
         if 'listFormConfigurations' in apis:
