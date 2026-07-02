@@ -21,6 +21,9 @@ class GetDF:
         self.getResponses_pattern = ['StartDate','EndDate','FormId']
         self.getResponseQuestion_pattern = ['StartDate','EndDate','FormId']
         self.getResponseQuestionData_pattern = ['StartDate','EndDate','FormId']
+        self.session = requests.Session() # Create one session for all requests
+
+ 
     
     def _headers_structure(self, *apis: str) -> dict:
         """Returns a dictionary with the APIs as keys and the names of headers
@@ -70,13 +73,10 @@ class GetDF:
         outer_list = {}
         payload = {}
         if 'listFormConfigurations' in apis:
-            outer_list.update({'listFormConfigurations': requests.request("GET",
-                                                                          self._urls('listFormConfigurations')[0],
-                                                                          headers = self._headers_list(
+            outer_list.update({'listFormConfigurations': self.session.get(self._urls('listFormConfigurations')[0], headers = self._headers_list(
                                                                               self._headers_structure,
                                                                               self.form_id[0],
-                                                                              'listFormConfigurations')[0],
-                                                                          data = payload).text})
+                                                                              'listFormConfigurations')[0], data = payload).text})
             
 
         apis = [a for a in apis if a != 'listFormConfigurations']
@@ -87,12 +87,8 @@ class GetDF:
                 self._urls(*apis),
                 self._headers_list(self._headers_structure,form,*apis)
             ):
-                outer_list.update({form + "|" + api:
-                                   requests.request("GET", url,
-                                                      headers = header,
-                                                      data = payload).text
-                })
-                
+                    outer_list.update({form + "|" + api:
+                                   self.session.get(url, headers = header, data = payload).text})
         return outer_list
     
     
