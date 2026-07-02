@@ -41,18 +41,16 @@ class GetDF:
                                      self.getResponseQuestion_pattern,
                                      self.getResponseQuestionData_pattern]))
         print([diction[api] for api in apis])
-        return [diction[api] for api in apis] 
+        return [diction[api] for api in apis] # list of lists - inner lists are headers patterns
     
     def _headers_list(self, headers_structure, form_id: str) -> list:
         """Returns lists of dictionaries for each form and the headers."""
         headers_arguments = dict(zip(['StartDate', 'EndDate', 'FormId'],
                                      [self.start_date, self.end_date, form_id]))
 
-        #headers_structures = [headers_structure(*apis)[api] for api in apis] 
-        # list of lists
-        
-        arguments = [
-            [headers_arguments[argument] for argument in struct]
+   
+        arguments = [ # produces a mirror list of lists to _headers_structure with the actual arguments passed
+            [headers_arguments[argument] for argument in struct] # in __call__ this is done per form
             for struct in headers_structure
         ] # list of lists
 
@@ -67,16 +65,16 @@ class GetDF:
         
         urls = [url_dict[api] for api in apis]
         
-        return urls
+        return urls # list of endpoints in scope
     
     def __call__(self, *apis: str) -> dict:
         outer_list = {}
-        self.headers_structure = self._headers_structure(*apis)
+        self.headers_structure = self._headers_structure(*apis) # list of lists where inner lists are headers patterns (endpoints in scope)
         payload = {}
         if 'listFormConfigurations' in apis:
             outer_list.update({'listFormConfigurations': self.session.get(self._urls('listFormConfigurations')[0], headers = self._headers_list(
-                                                                              self.headers_structure,
-                                                                              self.form_id[0])[0],
+                                                                              self.headers_structure, # header patterns
+                                                                              self.form_id[0])[0], # any form_id to make it work
                                                                               data = payload).text})
             
 
