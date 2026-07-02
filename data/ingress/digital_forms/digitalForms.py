@@ -22,6 +22,7 @@ class GetDF:
         self.getResponseQuestion_pattern = ['StartDate','EndDate','FormId']
         self.getResponseQuestionData_pattern = ['StartDate','EndDate','FormId']
         self.session = requests.Session() # Create one session for all requests
+        self.headers_structure = None
 
  
     
@@ -34,29 +35,28 @@ class GetDF:
             if submit not in api_options:
                 raise ValueError(f"Unsupported API name. Enter " \
                                  "one or more of the following: {api_options}")
-        print(dict(zip(api_options,[self.listFormConfigurations_pattern,
-                                     self.getResponses_pattern,
-                                     self.getResponseQuestion_pattern,
-                                     self.getResponseQuestionData_pattern])))
-        return dict(zip(api_options,[self.listFormConfigurations_pattern,
+        
+        diction = dict(zip(api_options,[self.listFormConfigurations_pattern,
                                      self.getResponses_pattern,
                                      self.getResponseQuestion_pattern,
                                      self.getResponseQuestionData_pattern]))
+        print([diction[api] for api in apis])
+        return [diction[api] for api in apis] 
     
-    def _headers_list(self, headers_structure, form_id: str, *apis: str) -> list:
+    def _headers_list(self, headers_structure, form_id: str) -> list:
         """Returns lists of dictionaries for each form and the headers."""
         headers_arguments = dict(zip(['StartDate', 'EndDate', 'FormId'],
                                      [self.start_date, self.end_date, form_id]))
 
-        headers_structures = [headers_structure(*apis)[api] for api in apis] 
+        #headers_structures = [headers_structure(*apis)[api] for api in apis] 
         # list of lists
         
         arguments = [
             [headers_arguments[argument] for argument in struct]
-            for struct in headers_structures
+            for struct in headers_structure
         ] # list of lists
 
-        return [dict(zip(k, v)) for k, v in zip(headers_structures, arguments)]
+        return [dict(zip(k, v)) for k, v in zip(headers_structure, arguments)]
     
     def _urls(self, *apis: str):
         """Returns a list of endpoints."""
@@ -71,12 +71,13 @@ class GetDF:
     
     def __call__(self, *apis: str) -> dict:
         outer_list = {}
+        self.headers_structure = self._headers_structure(*apis)
         payload = {}
         if 'listFormConfigurations' in apis:
             outer_list.update({'listFormConfigurations': self.session.get(self._urls('listFormConfigurations')[0], headers = self._headers_list(
-                                                                              self._headers_structure,
-                                                                              self.form_id[0],
-                                                                              'listFormConfigurations')[0], data = payload).text})
+                                                                              self.headers_structure,
+                                                                              self.form_id[0])[0],
+                                                                              data = payload).text})
             
 
         apis = [a for a in apis if a != 'listFormConfigurations']
@@ -85,7 +86,7 @@ class GetDF:
             for api, url, header in zip(
                 apis,
                 self._urls(*apis),
-                self._headers_list(self._headers_structure,form,*apis)
+                self._headers_list(self.headers_structure,form)
             ):
                     outer_list.update({form + "|" + api:
                                    self.session.get(url, headers = header, data = payload).text})
