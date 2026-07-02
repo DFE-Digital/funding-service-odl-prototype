@@ -70,9 +70,13 @@ class GetDF:
         outer_list = {}
         payload = {}
         if 'listFormConfigurations' in apis:
-            outer_list.update({'listFormConfigurations': requests.request("GET", self._urls('listFormConfigurations')[0],
-                                                      headers = self._headers_list(self._headers_structure,self.form_id[0],'listFormConfigurations')[0],
-                                                      data = payload).text})
+            outer_list.update({'listFormConfigurations': requests.request("GET",
+                                                                          self._urls('listFormConfigurations')[0],
+                                                                          headers = self._headers_list(
+                                                                              self._headers_structure,
+                                                                              self.form_id[0],
+                                                                              'listFormConfigurations')[0],
+                                                                          data = payload).text})
             
 
         apis = [a for a in apis if a != 'listFormConfigurations']
@@ -93,7 +97,9 @@ class GetDF:
     
     
  
-instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi','i3If3JGHw8','cb7bii5gx2','o50um3ao3a','x1xtt7u3p0','_igkp1ft5_','59m0cqvlku')
+instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi','i3If3JGHw8',
+                 'cb7bii5gx2','o50um3ao3a','x1xtt7u3p0','_igkp1ft5_',
+                 '59m0cqvlku')
 instance_call = instance('listFormConfigurations', 'getResponses',
                    'getResponseQuestion', 'getResponseQuestionData')
 
