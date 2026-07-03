@@ -5,12 +5,13 @@ getResponses_url = "https://preprod.externalapi.digital-forms.education.gov.uk/a
 getResponseQuestion_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/getResponseQuestion"
 getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.education.gov.uk/api/getResponseQuestionData"
 
+
 class GetDF:
     """This class can be instantiated with the required arguments to filter
     data across the 4 Digital Forms APIs. Data from the 4 APIs can be
     retrieved by calling an instance of this class."""
 
-    def __init__(self,start_date: str, end_date: str, *form_id: str):
+    def __init__(self, start_date: str, end_date: str, *form_id: str):
         """Initialises GetDF with both parameterised attributes and
         default-initialised attributes. Note that multiple form_ids can be
         passed."""
@@ -24,8 +25,6 @@ class GetDF:
         self.session = requests.Session() # Create one session for all requests
         self.headers_structure = None
 
- 
-    
     def _headers_structure(self, *apis: str) -> dict:
         """Returns a dictionary with the APIs as keys and the names of headers
         needed as values."""
@@ -35,7 +34,6 @@ class GetDF:
             if submit not in api_options:
                 raise ValueError(f"Unsupported API name. Enter " \
                                  "one or more of the following: {api_options}")
-        
         diction = dict(zip(api_options,[self.listFormConfigurations_pattern,
                                      self.getResponses_pattern,
                                      self.getResponseQuestion_pattern,
@@ -48,7 +46,6 @@ class GetDF:
         headers_arguments = dict(zip(['StartDate', 'EndDate', 'FormId'],
                                      [self.start_date, self.end_date, form_id]))
 
-   
         arguments = [ # produces a mirror list of lists to _headers_structure with the actual arguments passed
             [headers_arguments[argument] for argument in struct] # in __call__ this is done per form
             for struct in headers_structure
@@ -59,13 +56,11 @@ class GetDF:
     def _urls(self, *apis: str):
         """Returns a list of endpoints."""
         url_dict = {'listFormConfigurations': listFormConfigurations_url,
-             'getResponses': getResponses_url,
-             'getResponseQuestion': getResponseQuestion_url,
-             'getResponseQuestionData': getResponseQuestionData_url}
-        
+                    'getResponses': getResponses_url,
+                    'getResponseQuestion': getResponseQuestion_url,
+                    'getResponseQuestionData': getResponseQuestionData_url}
         urls = [url_dict[api] for api in apis]
-        
-        return urls # list of endpoints in scope
+        return urls  # list of endpoints in scope
     
     def __call__(self, *apis: str) -> dict:
         outer_list = {}
