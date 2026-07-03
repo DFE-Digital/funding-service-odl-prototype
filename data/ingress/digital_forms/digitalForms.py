@@ -11,6 +11,79 @@ getResponseQuestion_url = "https://preprod.externalapi.digital-forms.educati" \
 getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.edu" \
  "cation.gov.uk/api/getResponseQuestionData"
 
+# 1) URL 
+# 2) Headers 
+# 3) FormID as context
+
+endpoint_list = [
+    'listFormConfigurations',
+    'getResponses',
+    'getResponseQuestion',
+    'getResponseQuestionData',
+]
+
+
+BASE_URL = "https://preprod.externalapi.digital-forms.education.gov.uk/api/"
+
+
+
+
+
+class DigitalForms:
+
+    def __init__(self, start_date: str, end_date: str, form_ids: list[str]):
+        """Initialises GetDF with both parameterised attributes and
+        default-initialised attributes. Note that multiple form_ids can be
+        passed."""
+        self.start_date = start_date
+        self.end_date = end_date
+        self.form_ids = form_ids
+        self.session = requests.Session()
+
+    def get_endpoint_url(self, endpoint_name: str):
+        return BASE_URL + endpoint_name
+
+    def get_headers(self, endpoint_name, formid) -> dict:
+        if endpoint_name == 'listFormConfigurations':
+            return {}
+        else:
+            return {
+                'StartDate': self.start_date,
+                'EndDate': self.end_date,
+                'FormId': formid
+            }
+
+    def get_data(self):
+
+        # call listFormConfigurations
+        all_data = {}
+        for form_id in form_ids:
+            for endpoint in endpoint_list:
+                got_headers = self.get_headers(endpoint, form_id)
+                urls = self.get_endpoint_url(endpoint)
+                data = self.session.get(urls, headers=got_headers, data={}).text
+                all_data.update({form_id + "|" + endpoint: data})
+            #headers['FormId'] = form_id
+            # call getResponses
+            # call getResponseQuestion
+            # call getResponseQuestionData
+    
+    def write_data(self):
+
+        with pd.ExcelWriter("DigitalForms.xlsx") as writer:
+            for sheet_name, json_text in self.get_data():
+                data = json.loads(json_text)
+                df = pd.json_normalize(data)
+                df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+        
+        
+        
+      
+
+
+ 
+
+
 
 class GetDF:
     """This class can be instantiated with the required arguments to filter
@@ -96,7 +169,7 @@ class GetDF:
         return outer_list
 
 
-instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi', 'i3If3JGHw8',
+instance = GetDF('2020-05-05', '2026-06-20', '7c6iy7ajyi', 'i3If3JGHw8',
                  'cb7bii5gx2', 'o50um3ao3a', 'x1xtt7u3p0', '_igkp1ft5_',
                  '59m0cqvlku')
 instance_call = instance('listFormConfigurations', 'getResponses',
@@ -105,11 +178,14 @@ print(instance_call.keys())
 
 with pd.ExcelWriter("DigitalForms.xlsx") as writer:
     for sheet_name, json_text in instance_call.items():
-        try:
-            data = json.loads(json_text)
-            df = pd.json_normalize(data)
-            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
-        except json.JSONDecodeError:
-            # Fallback: write raw text if not JSON
-            df = pd.DataFrame({"raw_text": [json_text]})
-            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+        data = json.loads(json_text)
+        df = pd.json_normalize(data)
+        df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+#        try:
+#            data = json.loads(json_text)
+#            df = pd.json_normalize(data)
+#            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+#        except json.JSONDecodeError:
+#            # Fallback: write raw text if not JSON
+#            df = pd.DataFrame({"raw_text": [json_text]})
+#            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
