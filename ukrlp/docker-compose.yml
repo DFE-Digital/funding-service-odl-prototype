@@ -1,0 +1,34 @@
+services:
+  temporal:
+    image: temporalio/temporal:latest
+    container_name: ukrlp-temporal
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    volumes:
+      - temporal-data:/home/temporal
+    command: server start-dev --ip 0.0.0.0 --db-filename /home/temporal/temporal.db
+    healthcheck:
+      test: ["CMD", "temporal", "workflow", "list"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ukrlp-worker
+    depends_on:
+      temporal:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=ukrlp-task-queue
+    restart: unless-stopped
+
+volumes:
+  temporal-data:
