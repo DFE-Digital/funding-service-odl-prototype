@@ -61,8 +61,8 @@ class DigitalForms:
             for endpoint in endpoint_list:
                 got_headers = self.get_headers(endpoint, form_id)
                 urls = self.get_endpoint_url(endpoint)
-                data = self.session.get(urls, headers=got_headers, data={}).text
-                all_data.update({form_id + "|" + endpoint: data})
+                api_data = self.session.get(urls, headers=got_headers, data={}).text
+                all_data.update({form_id + "|" + endpoint: api_data})
             #headers['FormId'] = form_id
             # call getResponses
             # call getResponseQuestion
