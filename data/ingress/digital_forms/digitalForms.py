@@ -92,15 +92,26 @@ class GetDF:
     
     
  
-instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi','i3If3JGHw8',
-                 'cb7bii5gx2','o50um3ao3a','x1xtt7u3p0','_igkp1ft5_',
-                 '59m0cqvlku')
+instance = GetDF('2026-05-05', '2026-06-20', '7c6iy7ajyi','i3If3JGHw8','cb7bii5gx2','o50um3ao3a','x1xtt7u3p0','_igkp1ft5_','59m0cqvlku')
 instance_call = instance('listFormConfigurations', 'getResponses',
                    'getResponseQuestion', 'getResponseQuestionData')
 
 
-
-#print(instance('listFormConfigurations'))
-
-
 print(instance_call.keys())
+
+import json
+import pandas as pd
+
+with pd.ExcelWriter("DigitalForms.xlsx") as writer:
+    for sheet_name, json_text in instance_call.items():
+        try:
+            data = json.loads(json_text)
+            df = pd.json_normalize(data)
+            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+        except json.JSONDecodeError:
+            # Fallback: write raw text if not JSON
+            df = pd.DataFrame({"raw_text": [json_text]})
+            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+
+
+
