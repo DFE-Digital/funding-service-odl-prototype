@@ -11,10 +11,6 @@ getResponseQuestion_url = "https://preprod.externalapi.digital-forms.educati" \
 getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.edu" \
  "cation.gov.uk/api/getResponseQuestionData"
 
-# 1) URL 
-# 2) Headers 
-# 3) FormID as context
-
 endpoint_list = ['getResponses',
                  'getResponseQuestion',
                  'getResponseQuestionData']
@@ -25,7 +21,6 @@ BASE_URL = "https://preprod.externalapi.digital-forms.education.gov.uk/api/"
 class DigitalForms:
     """This class can be instantiated with the API headers. Data from the 4
     APIs can be retrieved by calling an instance of this class."""
-
     def __init__(self, start_date: str, end_date: str, form_ids: list[str]):
         """Initialises DigitalForms with both parameterised attributes and
         a session opening default-initialised attribute. Note that multiple
@@ -40,15 +35,13 @@ class DigitalForms:
         return BASE_URL + endpoint_name
 
     def get_headers(self, formid) -> dict:
-        return {
-                'StartDate': self.start_date,
+        """Returns the headers including the form_id."""
+        return {'StartDate': self.start_date,
                 'EndDate': self.end_date,
-                'FormId': formid
-            }
+                'FormId': formid}
 
     def get_data(self):
-
-        # call listFormConfigurations
+        """Returns Digital Forms data from the 4 APIs."""
         all_data = {}
         endpoint = 'listFormConfigurations'
         url = self.get_endpoint_url(endpoint)
@@ -65,7 +58,7 @@ class DigitalForms:
         return all_data
 
     def write_data(self):
-
+        """Writes the output of get_data() to an excel."""
         with pd.ExcelWriter("DigitalForms2.xlsx") as writer:
             for sheet_name, json_text in self.get_data().items():
                 data = json.loads(json_text)
@@ -77,10 +70,9 @@ digi_forms = DigitalForms('2020-05-05', '2026-06-20', ['7c6iy7ajyi',
                                                        'i3If3JGHw8'])
 digi_forms.write_data()
 
-#'cb7bii5gx2', 'o50um3ao3a', 'x1xtt7u3p0', '_igkp1ft5_','59m0cqvlku
+# 'cb7bii5gx2', 'o50um3ao3a', 'x1xtt7u3p0', '_igkp1ft5_','59m0cqvlku
 
-
-#class GetDF:
+# class GetDF:
 #    """This class can be instantiated with the required arguments to filter
 #    data across the 4 Digital Forms APIs. Data from the 4 APIs can be
 #    retrieved by calling an instance of this class."""
@@ -99,10 +91,10 @@ digi_forms.write_data()
 #                                                 'FormId']
 #         # Create one session for all
 #         self.session = requests.Session()
-#         self.headers_structure = None  # Updated once when the object is called
+#         self.headers_structure = None  # Updated once when the object called
 
 #     def _headers_structure(self, *apis: str) -> dict:
-#         """Returns a dictionary with the APIs as keys and the names of headers
+#         """Returns a dictionary with the APIs as keys and the header's names
 #         needed as values."""
 #         api_options = ['listFormConfigurations', 'getResponses',
 #                        'getResponseQuestion', 'getResponseQuestionData']
