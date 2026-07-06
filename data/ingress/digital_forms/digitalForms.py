@@ -1,6 +1,10 @@
 import requests
 import json
 import pandas as pd
+from loguru import logger
+
+logger.info("This works!")
+#logger.add("errors.log", level = warning)
 
 listFormConfigurations_url = "https://preprod.externalapi.digital-forms.educ" \
  "ation.gov.uk/api/listFormConfigurations"
