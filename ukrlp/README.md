@@ -10,15 +10,15 @@ Simple Python client for the UKPIMS/UKRLP provider export endpoint:
 ## Questions for UKRLP
 
 1. What page size should we use. 1000 sometimes works but I got 500 errors one morning.
-   - Retry strategy for 500s?
-2. Rate limits / fair usage
-3. Is there a more fleshed out swagger file with responses and example requests etc?
-4. What format should datetime inputs be?
-5. How are other teams using this API?
-   - Any examples in GitHub etc.?
-6. Pagination
+1. Pagination
    - What if data changes during requesting pages?
    - Can we request pages asynchronously?
+   - Retry strategy for 500s?
+1. Rate limits / fair usage
+1. Is there a more fleshed out swagger file with responses and example requests etc?
+1. What format should datetime inputs be?
+1. How are other teams using this API?
+   - Any examples in GitHub etc.?
 
 ## 1) Install
 
