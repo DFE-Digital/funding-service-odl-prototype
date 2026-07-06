@@ -2,6 +2,7 @@ import io
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Dict
 import pandas as pd
 from pandas import DataFrame
 import requests
@@ -136,12 +137,12 @@ class GIASIngestion:
             )
 
 
-if __name__ == "__main__":
-    gias_base_url = (
+def run_ingestion(
+    gias_base_url: str = (
         "https://ea-edubase-api-prod.azurewebsites.net/"
         "edubase/downloads/public/"
-    )
-    gias_datasets = {
+    ),
+    gias_datasets: Dict[str, str] = {
         "edubasealldata": "establishment_all_fields",
         "links_edubasealldata": "establishment_links",
         "edubaseallacademiesandfree": "academies_and_free_school_ﬁelds",
@@ -158,7 +159,13 @@ if __name__ == "__main__":
         "governanceladata": (
             "all_local_authority_maintained_governance_records"
         ),
-    }
+    },
+) -> None:
+    """Run gias ingestion
+    Args:
+            gias_base_url (str): DataFrame object of GIAS data
+            gias_datasets (Dict[str, str])): gias datasets to ingest
+    """
 
     # run ingestion
     gias_injestion = GIASIngestion(
@@ -166,3 +173,7 @@ if __name__ == "__main__":
     )
 
     gias_injestion.run()
+
+
+if __name__ == "__main__":
+    run_ingestion()
