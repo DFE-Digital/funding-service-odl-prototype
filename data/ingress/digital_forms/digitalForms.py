@@ -23,16 +23,20 @@ BASE_URL = "https://preprod.externalapi.digital-forms.education.gov.uk/api/"
 
 
 class DigitalForms:
+    """This class can be instantiated with the API headers. Data from the 4
+    APIs can be retrieved by calling an instance of this class."""
+
     def __init__(self, start_date: str, end_date: str, form_ids: list[str]):
-        """Initialises GetDF with both parameterised attributes and
-        default-initialised attributes. Note that multiple form_ids can be
-        passed."""
+        """Initialises DigitalForms with both parameterised attributes and
+        a session opening default-initialised attribute. Note that multiple
+        form_ids can be passed."""
         self.start_date = start_date
         self.end_date = end_date
         self.form_ids = form_ids
         self.session = requests.Session()
 
     def get_endpoint_url(self, endpoint_name: str):
+        """Returns an endpoint URL from an endpoint reference."""
         return BASE_URL + endpoint_name
 
     def get_headers(self, formid) -> dict:
