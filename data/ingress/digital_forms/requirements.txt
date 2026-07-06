@@ -1,7 +1,11 @@
 certifi==2026.6.17
 charset-normalizer==3.4.7
+colorama==0.4.6
+et_xmlfile==2.0.0
 idna==3.18
+loguru==0.7.3
 numpy==2.5.0
+openpyxl==3.1.5
 pandas==3.0.3
 polars==1.42.0
 polars-runtime-32==1.42.0
@@ -10,3 +14,4 @@ requests==2.34.2
 six==1.17.0
 tzdata==2026.2
 urllib3==2.7.0
+win32_setctime==1.2.0
