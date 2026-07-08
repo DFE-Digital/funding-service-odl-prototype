@@ -17,12 +17,6 @@ logger.add(
     compression="zip",
     level="INFO")
 
-
-
-#logger.info("This works!")
-#logger.add("errors.log", level = warning)
-
-
 listFormConfigurations_url = "https://preprod.externalapi.digital-forms.educ" \
  "ation.gov.uk/api/listFormConfigurations"
 getResponses_url = "https://preprod.externalapi.digital-forms.education.gov." \
@@ -70,9 +64,28 @@ class DigitalForms:
             endpoint = 'listFormConfigurations'
             url = self.get_endpoint_url(endpoint)
             api_response = self.session.get(url)
-            if api_response.status_code == 204:
-                logger.warning("Empty data found")
             api_data = api_response.text
+            if api_response.status_code == 204:
+                logger.warning("No data found for API "
+                               f"{endpoint} (code: "
+                               f"{api_response.status_code}).")
+            else:
+                logger.info("Data found for API "
+                            f"{endpoint} (code: "
+                            f"{api_response.status_code}). "
+                            f"Time: "
+                            f"{api_response.elapsed
+                               .total_seconds():.3f}"
+                            "s")
+
+            # JSON validity check
+            try:
+                json.loads(api_data)
+            except json.JSONDecodeError:
+                logger.error(
+                    f"Invalid JSON for API {endpoint} "
+                    f"(code: {api_response.status_code}).")
+
             all_data[endpoint] = api_data
 
             for form_id in self.form_ids:
@@ -80,25 +93,38 @@ class DigitalForms:
                     headers = self.get_headers(form_id)
                     urls = self.get_endpoint_url(endpoint)
                     api_response = self.session.get(urls, headers=headers)
-                    if api_response.status_code == 204:
-                        logger.warning("Empty data found")
                     api_data = api_response.text
-                    if len(api_data) < 5:
-                        logger.warning(f"Minimal data found for form {form_id} and endpoint {endpoint}.")
+                    if api_response.status_code == 204:
+                        logger.warning("No data found for form "
+                                       f"{form_id} and API {endpoint} "
+                                       f"(code: {api_response.status_code}).")
                     else:
-                        logger.info(f"Significant data found for form {form_id} and endpoint {endpoint}.")
+                        logger.info("Data found for form "
+                                    f"{form_id} and API {endpoint} "
+                                    f"(code: {api_response.status_code}). "
+                                    f"Time: "
+                                    f"{api_response.elapsed
+                                       .total_seconds():.3f}"
+                                    "s")
+
+                    # JSON validity check
+                    try:
+                        json.loads(api_data)
+                    except json.JSONDecodeError:
+                        logger.error(
+                            f"Invalid JSON for form {form_id} and API "
+                            f"{endpoint} (code: {api_response.status_code}).")
 
                     all_data[form_id + "|" + endpoint] = api_data
-
             logger.info("Digital Forms data downloaded.")
 
-        except Exception as e:
-            logger.error(f"Error downloading Digital Forms data: {e}")
+        except Exception:
+            logger.exception("Error downloading Digital Forms data.")
             raise
 
         return all_data
 
-    def write_data(self,excel):
+    def write_data(self, excel):
         """Writes the output of get_data() to an excel."""
         try:
             with pd.ExcelWriter(excel) as writer:
@@ -107,10 +133,10 @@ class DigitalForms:
                     df = pd.json_normalize(data)
                     df.to_excel(writer, sheet_name=sheet_name[:31],
                                 index=False)
-            logger.success(f"Data has been written to the {excel} excel")
-            
-        except Exception as e:
-            logger.error(f"Error writing Digital Forms data to the excel: {e}")
+            logger.success(f"Data has been written to the {excel} excel.")
+
+        except Exception:
+            logger.exception("Error writing Digital Forms data to the excel.")
             raise
 
 
