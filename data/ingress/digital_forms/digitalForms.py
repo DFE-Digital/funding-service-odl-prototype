@@ -3,28 +3,22 @@ import json
 import pandas as pd
 from loguru import logger
 import sys
+from pathlib import Path
 
 # Remove default handlers
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 # Create a new log file every day, keep logs for 30 days, zip the old ones
 # and only log INFO or higher
+log_path = Path(__file__).parent / 'logs'
+log_path.mkdir(exist_ok=True)
+
 logger.add(
-    "C:/Users/bmartin2/code_projects/funding-service-odl-prototype/logs/"
-    "digital_forms_pipeline_{time:YYYY-MM-DD}.log",
+    log_path / "digital_forms_pipeline_{time:YYYY-MM-DD}.log",
     rotation="1 day",
     retention="30 days",
     compression="zip",
     level="INFO")
-
-listFormConfigurations_url = "https://preprod.externalapi.digital-forms.educ" \
- "ation.gov.uk/api/listFormConfigurations"
-getResponses_url = "https://preprod.externalapi.digital-forms.education.gov." \
- "uk/api/getResponses"
-getResponseQuestion_url = "https://preprod.externalapi.digital-forms.educati" \
- "on.gov.uk/api/getResponseQuestion"
-getResponseQuestionData_url = "https://preprod.externalapi.digital-forms.edu" \
- "cation.gov.uk/api/getResponseQuestionData"
 
 endpoint_list = ['getResponses',
                  'getResponseQuestion',
@@ -140,11 +134,19 @@ class DigitalForms:
             raise
 
 
-digi_forms = DigitalForms('2020-05-05', '2026-06-20', ['7c6iy7ajyi',
-                                                       '59m0cqvlku',
-                                                       'cb7bii5gx2',
-                                                       'o50um3ao3a',
-                                                       'x1xtt7u3p0',
-                                                       '_igkp1ft5_',
-                                                       '59m0cqvlku'])
-digi_forms.write_data("DigitalForms2.xlsx")
+def run_process():
+    relevant_forms = [
+        '7c6iy7ajyi',
+        '59m0cqvlku',
+        'cb7bii5gx2',
+        'o50um3ao3a',
+        'x1xtt7u3p0',
+        '_igkp1ft5_',
+        '59m0cqvlku'
+    ]
+    digi_forms = DigitalForms('2020-05-05', '2026-06-20', relevant_forms)
+    digi_forms.write_data("DigitalForms2.xlsx")
+
+
+if __name__ == '__main__':
+    run_process()
