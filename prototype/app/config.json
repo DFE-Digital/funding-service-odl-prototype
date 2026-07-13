@@ -1,5 +1,5 @@
 {
-  "serviceName": "Funding Data Service (ODL)",
+  "serviceName": "Funding Service",
   "plugins": {
     "govuk-frontend": {
       "rebrand": true

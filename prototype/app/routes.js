@@ -7,3 +7,6 @@ const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
 // Add your routes here
+router.get('/edit-permissions', function (req, res) {
+  res.render('edit-permissions')
+})
