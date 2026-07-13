@@ -38,6 +38,7 @@ class DigitalForms:
         self.end_date = end_date
         self.form_ids = form_ids
         self.session = requests.Session()
+        self.api_data = None
 
     def get_endpoint_url(self, endpoint_name: str) -> str:
         """Returns an endpoint URL from an endpoint reference."""
@@ -117,20 +118,19 @@ class DigitalForms:
             logger.exception("Error downloading Digital Forms data.")
             raise
 
-        return all_data
+        self.api_data = self.all_data
 
-    def write_data(self, excel_prefix: str) -> None:
+    def write_to_excel(self, excel_prefix: str) -> None:
         """Writes the output of get_data() to an excel."""
         excels = ['listFormConfigurations']
         excels.extend(endpoint_list)
         excels = [excel_prefix+"_"+endpoint+".xlsx" for endpoint in excels]
 
         try:
-            data = self.get_data()
 
             for exc in excels:
                 with pd.ExcelWriter(exc) as writer:
-                    for sheet_name, json_text in data.items():
+                    for sheet_name, json_text in self.api_data.items():
                         if sheet_name.rpartition("|")[2] != exc.\
                          rpartition("_")[2].replace(".xlsx", ""):
                             continue
@@ -144,8 +144,18 @@ class DigitalForms:
             logger.exception("Error writing Digital Forms data.")
             raise
 
+    def write_to_JSON(self, df: DataFrame, dataset_name: str) -> None:
+        try:
+            filename = f"{dataset_name}_{self.today}.json"
+            df.to_json(filename, orient="records", date_format="iso", indent=4)
+            logger.success(f"JSON file written: {filename}")
 
-def run_process() -> None:
+        except Exception:
+            logger.exception("Error writing Digital Forms data.")
+            raise
+
+
+def run_process(write_excel=False, write_JSON=True) -> None:
     """Orchestrates getting and writing the data for a hardcoded forms list."""
     relevant_forms = [
         '7c6iy7ajyi',
@@ -156,8 +166,16 @@ def run_process() -> None:
         '_igkp1ft5_',
         '59m0cqvlku'
     ]
+
     digi_forms = DigitalForms('2020-05-05', '2026-06-20', relevant_forms)
-    digi_forms.write_data("DigitalForms")
+
+    prefix = "DigitalForms"
+
+    if write_excel is True:
+        digi_forms.write_to_excel(prefix)
+
+    if write_JSON is True:
+        digi_forms.write_to_JSON(prefix)
 
 
 if __name__ == '__main__':
