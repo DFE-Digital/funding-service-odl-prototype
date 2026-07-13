@@ -39,17 +39,17 @@ class DigitalForms:
         self.form_ids = form_ids
         self.session = requests.Session()
 
-    def get_endpoint_url(self, endpoint_name: str):
+    def get_endpoint_url(self, endpoint_name: str) -> str:
         """Returns an endpoint URL from an endpoint reference."""
         return BASE_URL + endpoint_name
 
-    def get_headers(self, formid) -> dict:
+    def get_headers(self, formid: str) -> dict:
         """Returns the headers including the form_id."""
         return {'StartDate': self.start_date,
                 'EndDate': self.end_date,
                 'FormId': formid}
 
-    def get_data(self):
+    def get_data(self) -> dict:
         """Returns Digital Forms data from the 4 APIs."""
         logger.info("Downloading Digital Forms data...")
         all_data = {}
@@ -57,7 +57,7 @@ class DigitalForms:
         try:
             endpoint = 'listFormConfigurations'
             url = self.get_endpoint_url(endpoint)
-            api_response = self.session.get(url)
+            api_response = self.session.get(url, timeout=300)
             api_data = api_response.text
             if api_response.status_code == 204:
                 logger.warning("No data found for API "
@@ -86,7 +86,8 @@ class DigitalForms:
                 for endpoint in endpoint_list:
                     headers = self.get_headers(form_id)
                     urls = self.get_endpoint_url(endpoint)
-                    api_response = self.session.get(urls, headers=headers)
+                    api_response = self.session.get(urls, headers=headers,
+                                                    timeout=300)
                     api_data = api_response.text
                     if api_response.status_code == 204:
                         logger.warning("No data found for form "
@@ -118,11 +119,11 @@ class DigitalForms:
 
         return all_data
 
-    def write_data(self, excel):
+    def write_data(self, excel_prefix: str) -> None:
         """Writes the output of get_data() to an excel."""
         excels = ['listFormConfigurations']
         excels.extend(endpoint_list)
-        excels = [excel+"_"+endpoint+".xlsx" for endpoint in excels]
+        excels = [excel_prefix+"_"+endpoint+".xlsx" for endpoint in excels]
 
         try:
             data = self.get_data()
@@ -130,20 +131,22 @@ class DigitalForms:
             for exc in excels:
                 with pd.ExcelWriter(exc) as writer:
                     for sheet_name, json_text in data.items():
-                        if sheet_name.rpartition("|")[2]+".xlsx" != exc.\
-                         rpartition("_")[2]:
+                        if sheet_name.rpartition("|")[2] != exc.\
+                         rpartition("_")[2].replace(".xlsx", ""):
                             continue
                         df = pd.json_normalize(json.loads(json_text))
                         df.to_excel(writer, sheet_name=sheet_name[:31],
                                     index=False)
-            logger.success(f"Data has been written to the {excel} excels.")
+            logger.success(f"Data has been written to the {excel_prefix} "
+                           "excels.")
 
         except Exception:
             logger.exception("Error writing Digital Forms data.")
             raise
 
 
-def run_process():
+def run_process() -> None:
+    """Orchestrates getting and writing the data for a hardcoded forms list."""
     relevant_forms = [
         '7c6iy7ajyi',
         '59m0cqvlku',
