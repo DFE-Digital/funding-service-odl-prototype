@@ -120,17 +120,26 @@ class DigitalForms:
 
     def write_data(self, excel):
         """Writes the output of get_data() to an excel."""
+        excels = ['listFormConfigurations']
+        excels.extend(endpoint_list)
+        excels = [excel+"_"+endpoint+".xlsx" for endpoint in excels]
+
         try:
-            with pd.ExcelWriter(excel) as writer:
-                for sheet_name, json_text in self.get_data().items():
-                    data = json.loads(json_text)
-                    df = pd.json_normalize(data)
-                    df.to_excel(writer, sheet_name=sheet_name[:31],
-                                index=False)
-            logger.success(f"Data has been written to the {excel} excel.")
+            data = self.get_data()
+
+            for exc in excels:
+                with pd.ExcelWriter(exc) as writer:
+                    for sheet_name, json_text in data.items():
+                        if sheet_name.rpartition("|")[2]+".xlsx" != exc.\
+                         rpartition("_")[2]:
+                            continue
+                        df = pd.json_normalize(json.loads(json_text))
+                        df.to_excel(writer, sheet_name=sheet_name[:31],
+                                    index=False)
+            logger.success(f"Data has been written to the {excel} excels.")
 
         except Exception:
-            logger.exception("Error writing Digital Forms data to the excel.")
+            logger.exception("Error writing Digital Forms data.")
             raise
 
 
@@ -145,7 +154,7 @@ def run_process():
         '59m0cqvlku'
     ]
     digi_forms = DigitalForms('2020-05-05', '2026-06-20', relevant_forms)
-    digi_forms.write_data("DigitalForms2.xlsx")
+    digi_forms.write_data("DigitalForms")
 
 
 if __name__ == '__main__':
