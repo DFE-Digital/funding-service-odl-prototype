@@ -39,6 +39,7 @@ class DigitalForms:
         self.form_ids = form_ids
         self.session = requests.Session()
         self.api_data = None
+        self.api_data_json = None
 
     def get_endpoint_url(self, endpoint_name: str) -> str:
         """Returns an endpoint URL from an endpoint reference."""
@@ -54,12 +55,24 @@ class DigitalForms:
         """Returns Digital Forms data from the 4 APIs."""
         logger.info("Downloading Digital Forms data...")
         all_data = {}
+        all_data_json = {}
 
         try:
             endpoint = 'listFormConfigurations'
             url = self.get_endpoint_url(endpoint)
             api_response = self.session.get(url, timeout=300)
             api_data = api_response.text
+
+            # JSON validity check
+            try:
+                json.loads(api_data)
+            except json.JSONDecodeError:
+                logger.error(
+                    f"Invalid JSON for API {endpoint} "
+                    f"(code: {api_response.status_code}).")
+
+            api_data_json = api_response.json()
+
             if api_response.status_code == 204:
                 logger.warning("No data found for API "
                                f"{endpoint} (code: "
@@ -73,15 +86,8 @@ class DigitalForms:
                                .total_seconds():.3f}"
                             "s")
 
-            # JSON validity check
-            try:
-                json.loads(api_data)
-            except json.JSONDecodeError:
-                logger.error(
-                    f"Invalid JSON for API {endpoint} "
-                    f"(code: {api_response.status_code}).")
-
             all_data[endpoint] = api_data
+            all_data_json[endpoint] = api_data_json
 
             for form_id in self.form_ids:
                 for endpoint in endpoint_list:
@@ -90,6 +96,17 @@ class DigitalForms:
                     api_response = self.session.get(urls, headers=headers,
                                                     timeout=300)
                     api_data = api_response.text
+
+                    # JSON validity check
+                    try:
+                        json.loads(api_data)
+                    except json.JSONDecodeError:
+                        logger.error(
+                            f"Invalid JSON for form {form_id} and API "
+                            f"{endpoint} (code: {api_response.status_code}).")
+
+                    api_data_json = api_response.json()
+
                     if api_response.status_code == 204:
                         logger.warning("No data found for form "
                                        f"{form_id} and API {endpoint} "
@@ -103,25 +120,20 @@ class DigitalForms:
                                        .total_seconds():.3f}"
                                     "s")
 
-                    # JSON validity check
-                    try:
-                        json.loads(api_data)
-                    except json.JSONDecodeError:
-                        logger.error(
-                            f"Invalid JSON for form {form_id} and API "
-                            f"{endpoint} (code: {api_response.status_code}).")
-
                     all_data[form_id + "|" + endpoint] = api_data
+                    all_data_json[form_id + "|" + endpoint] = api_data_json
+
             logger.info("Digital Forms data downloaded.")
 
         except Exception:
             logger.exception("Error downloading Digital Forms data.")
             raise
 
-        self.api_data = self.all_data
+        self.api_data = all_data
+        self.api_data_json = all_data_json
 
     def write_to_excel(self, excel_prefix: str) -> None:
-        """Writes the output of get_data() to an excel."""
+        """Writes the output of get_data() to excel files."""
         excels = ['listFormConfigurations']
         excels.extend(endpoint_list)
         excels = [excel_prefix+"_"+endpoint+".xlsx" for endpoint in excels]
@@ -141,14 +153,22 @@ class DigitalForms:
                            "excels.")
 
         except Exception:
-            logger.exception("Error writing Digital Forms data.")
+            logger.exception("Error writing Digital Forms data to excel.")
             raise
 
-    def write_to_JSON(self, df: DataFrame, dataset_name: str) -> None:
+    def write_to_JSON(self, json_prefix: str) -> None:
+        """Writes the output of get_data() to JSON files."""
+        jsons = ['listFormConfigurations']
+        jsons.extend(endpoint_list)
+        jsons = [json_prefix+"_"+endpoint+".json" for endpoint in jsons]
+
         try:
-            filename = f"{dataset_name}_{self.today}.json"
-            df.to_json(filename, orient="records", date_format="iso", indent=4)
-            logger.success(f"JSON file written: {filename}")
+            for js in jsons:
+                with open(js, 'w', encoding='utf-8') as file:
+                    filtered_data = {k: v for k, v in self.api_data_json.items() if k.rpartition("|")[2] == js.rpartition("_")[2].replace(".json", "")}
+                    json.dump(filtered_data, file, indent=4)
+            logger.success(f"Data has been written to the {json_prefix} "
+                           "JSON files.")
 
         except Exception:
             logger.exception("Error writing Digital Forms data.")
@@ -168,6 +188,7 @@ def run_process(write_excel=False, write_JSON=True) -> None:
     ]
 
     digi_forms = DigitalForms('2020-05-05', '2026-06-20', relevant_forms)
+    digi_forms.get_data()
 
     prefix = "DigitalForms"
 
@@ -179,4 +200,4 @@ def run_process(write_excel=False, write_JSON=True) -> None:
 
 
 if __name__ == '__main__':
-    run_process()
+    run_process(write_excel=True, write_JSON=True)
