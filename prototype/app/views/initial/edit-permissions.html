@@ -1,0 +1,76 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+  Edit permissions – Service name – GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+  <a class="govuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-xl">Funding data access</span>
+      <h1 class="govuk-heading-xl">Edit permissions</h1>
+
+      <p class="govuk-body">
+        Review and update who can view, edit or approve this funding dataset.
+      </p>
+
+      <div class="govuk-inset-text">
+        Changes made here apply immediately to the selected dataset and its linked users.
+      </div>
+
+      <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Current permissions</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">&nbsp;</th>
+            <th scope="col" class="govuk-table__header">Analyst</th>
+            <th scope="col" class="govuk-table__header">Lead Analyst</th>
+            <th scope="col" class="govuk-table__header">QA Lead</th>
+            <th scope="col" class="govuk-table__header">Approver</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">Create</td>
+            <td class="govuk-table__cell">Finance</td>
+            <td class="govuk-table__cell">Approver</td>
+            <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Active</strong></td>
+            <td class="govuk-table__cell"><a class="govuk-link" href="#">Change</a></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">Read</td>
+            <td class="govuk-table__cell">Data insights</td>
+            <td class="govuk-table__cell">Editor</td>
+            <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--green">Active</strong></td>
+            <td class="govuk-table__cell"><a class="govuk-link" href="#">Change</a></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">Update</td>
+            <td class="govuk-table__cell">Governance</td>
+            <td class="govuk-table__cell">Viewer</td>
+            <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--blue">Pending</strong></td>
+            <td class="govuk-table__cell"><a class="govuk-link" href="#">Change</a></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">Delete</td>
+            <td class="govuk-table__cell">Operations</td>
+            <td class="govuk-table__cell">Viewer</td>
+            <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Inactive</strong></td>
+            <td class="govuk-table__cell"><a class="govuk-link" href="#">Change</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="govuk-button-group">
+        <a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+          Save changes
+        </a>
+        <a class="govuk-link" href="/datasets">Cancel</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

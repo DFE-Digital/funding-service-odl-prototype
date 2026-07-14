@@ -1,0 +1,210 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+  Datasets – Service name – GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+  <a class="govuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h1 class="govuk-heading-xl">
+        Datasets
+      </h1>
+
+      <p class="govuk-body">
+        View the DfE funding data for schools and local authorities.
+      </p>
+
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">
+            Filter and sort data
+          </span>
+        </summary>
+        <div class="govuk-details__text">
+          <form class="form" action="" method="get" novalidate>
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="filter-year">
+                Academic year
+              </label>
+              <select class="govuk-select" id="filter-year" name="year">
+                <option>All years</option>
+                <option selected>2024/25</option>
+                <option>2023/24</option>
+                <option>2022/23</option>
+              </select>
+            </div>
+
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="filter-type">
+                Funding type
+              </label>
+              <select class="govuk-select" id="filter-type" name="type">
+                <option>All types</option>
+                <option>Schools Direct Grants</option>
+                <option>High Needs</option>
+                <option>Early Years</option>
+                <option>Post-16</option>
+              </select>
+            </div>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+              Apply filters
+            </button>
+          </form>
+        </div>
+      </details>
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--m">
+              DfE Funding Data 2024/25
+            </caption>
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Local Authority</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Schools Direct Grants (£)</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">High Needs (£)</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Early Years (£)</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Post-16 (£)</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Total (£)</th>
+                <th scope="col" class="govuk-table__header">Status</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Bath and North East Somerset</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">145,250,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">28,500,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">12,750,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">8,900,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">195,400,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--green">Approved</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Barking and Dagenham</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">234,100,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">45,200,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">19,800,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">14,500,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">313,600,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--green">Approved</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Kent</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">567,850,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">98,750,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">42,300,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">31,200,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">740,100,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--green">Approved</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Sheffield</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">412,300,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">72,400,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">31,900,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">22,100,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">538,700,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--yellow">In review</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Greater Manchester</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">782,100,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">135,600,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">58,200,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">42,300,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">1,018,200,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--blue">Submitted</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">East Riding of Yorkshire</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">178,950,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">31,200,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">13,450,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">9,800,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">233,400,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--green">Approved</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Oxfordshire</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">356,700,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">62,100,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">26,800,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">19,500,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">465,100,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--green">Approved</strong>
+                </td>
+              </tr>
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">Cambridgeshire</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">289,450,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">50,300,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">21,600,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">15,700,000</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">377,050,000</td>
+                <td class="govuk-table__cell">
+                  <strong class="govuk-tag govuk-tag--red">Failed</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 class="govuk-heading-m">
+        Data download
+      </h2>
+
+      <p class="govuk-body">
+        Download the complete dataset for analysis:
+      </p>
+
+      <ul class="govuk-list">
+        <li>
+          <a class="govuk-link" href="/download/dfe-funding-2024-25.csv">
+            DfE Funding Data 2024/25 (CSV)
+          </a>
+        </li>
+        <li>
+          <a class="govuk-link" href="/download/dfe-funding-2024-25.xlsx">
+            DfE Funding Data 2024/25 (Excel)
+          </a>
+        </li>
+        <li>
+          <a class="govuk-link" href="/download/dfe-funding-historical.zip">
+            Historical data (2019/20 - 2023/24)
+          </a>
+        </li>
+      </ul>
+
+      <h2 class="govuk-heading-m">
+        Help and support
+      </h2>
+
+      <p class="govuk-body">
+        For more information about the data or if you need help, <a class="govuk-link" href="/contact">contact us</a>.
+      </p>
+
+    </div>
+  </div>
+{% endblock %}
