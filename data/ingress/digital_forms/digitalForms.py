@@ -197,4 +197,4 @@ def run_process(write_excel=False, write_JSON=True) -> None:
 
 
 if __name__ == '__main__':
-    run_process(write_excel=True, write_JSON=True)
+    run_process(write_excel=False, write_JSON=True)
