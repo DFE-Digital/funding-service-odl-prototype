@@ -71,3 +71,8 @@ usage-data-config.json
 # General ignores
 .DS_Store
 .idea
+.venv/
+
+#duckdb
+*.duckdb
+*.duckdb.wal
