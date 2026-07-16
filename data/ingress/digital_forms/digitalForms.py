@@ -81,7 +81,7 @@ class DigitalForms:
                 f"Time: {response.elapsed.total_seconds():.3f}s"
             )
 
-    def api_data_json(self, api_response, endpoint):
+    def parse_json(self, api_response, endpoint):
         """JSON validation that terminates ingestion if it fails."""
         try:
             return api_response.json()
@@ -103,7 +103,7 @@ class DigitalForms:
             url = self.get_endpoint_url(endpoint)
             api_response = self.safe_get(url)
 
-            api_data = self.api_data_json(api_response, endpoint)
+            api_data = self.parse_json(api_response, endpoint)
 
             self.data_check(endpoint, None, api_response)
 
@@ -115,7 +115,7 @@ class DigitalForms:
                     urls = self.get_endpoint_url(ep)
                     api_response = self.safe_get(urls, headers)
 
-                    api_data = self.api_data_json(api_response, ep)
+                    api_data = self.parse_json(api_response, ep)
 
                     self.data_check(ep, form_id, api_response)
 
