@@ -76,8 +76,8 @@ class DigitalForms:
             )
         else:
             logger.info(
-                f"Data found for {check_prefix} (code: {response.status_code}"
-                "). "
+                f"Data found for {check_prefix} "
+                f"(code: {response.status_code}). "
                 f"Time: {response.elapsed.total_seconds():.3f}s"
             )
 
@@ -85,7 +85,7 @@ class DigitalForms:
         """JSON validation that terminates ingestion if it fails."""
         try:
             return api_response.json()
-        except json.JSONDecodeError:
+        except ValueError:
             logger.error(f"Invalid JSON for API {endpoint} "
                          f"(code: {api_response.status_code}).")
             raise
@@ -93,8 +93,8 @@ class DigitalForms:
     def close_session(self):
         self.session.close()
 
-    def get_data(self) -> dict:
-        """Returns Digital Forms data from the 4 APIs."""
+    def get_data(self) -> None:
+        """Updates self.api_data with Digital Forms data from the 4 APIs."""
         logger.info("Downloading Digital Forms data...")
         all_data = {}
 
@@ -157,12 +157,13 @@ def run_process(scoped_forms: list[str]) -> None:
     """Orchestrates getting and writing the data."""
 
     digi_forms = DigitalForms("2020-05-05", "2026-06-20", scoped_forms)
-    digi_forms.get_data()
-
     prefix = "Digital_Forms"
-    digi_forms.write_to_JSON(prefix)
 
-    digi_forms.close_session()
+    try:
+        digi_forms.get_data()
+        digi_forms.write_to_JSON(prefix)
+    finally:
+        digi_forms.close_session()
 
 
 if __name__ == "__main__":
