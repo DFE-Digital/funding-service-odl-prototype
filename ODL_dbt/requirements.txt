@@ -1,0 +1,10 @@
+# DBT
+duckdb
+dbt-duckdb
+databricks-sql-connector
+pandas
+python-dotenv
+
+# Formattings
+ruff
+flake8

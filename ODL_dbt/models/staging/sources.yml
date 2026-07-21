@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: main
+    tables:
+      - name: raw_census
+
+  - name: gias
+    database: catalog_30_bronze 
+    schema: gias_public
+    tables:
+      - name: establishment_fields
+      
