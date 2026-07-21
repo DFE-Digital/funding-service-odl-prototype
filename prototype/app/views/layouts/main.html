@@ -6,43 +6,11 @@ https://prototype-kit.service.gov.uk/docs/how-to-use-layouts
 {% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
-
-{% extends "govuk-prototype-kit/layouts/govuk-branded.html" %}
-
 {% block header %}
-  {{ govukHeader() }}
 
-  {{ govukServiceNavigation({
-    serviceName: serviceName,
-    serviceUrl: "/",
-    navigation: [
-      {
-        href: "/prepare-data",
-        text: "Prepare data",
-        active: pageName == "prepare-data"
-      },
-      {
-        href: "/calculate",
-        text: "Calculate",
-        active: pageName == "calculate"
-      },
-      {
-        href: "/communicate",
-        text: "Communicate",
-        active: pageName == "communicate"
-      },
-      {
-        href: "/manage-payments",
-        text: "Manage payments",
-        active: pageName == "manage-payments"
-      }      
-    ]
-  }) }}
-{% endblock %}
+    {{ govukHeader() }}
+    {{ govukServiceNavigation({
+        serviceName: serviceName
+    })}}
 
-
-
-{% block scripts %}
-    {{ super() }}
-    <script src="/assets/js/dfefrontend.min.js"></script>
 {% endblock %}
