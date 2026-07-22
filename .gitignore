@@ -109,3 +109,13 @@ logs/
 # OS cruft
 .DS_Store
 Thumbs.db
+.venv/
+
+#duckdb
+*.duckdb
+*.duckdb.wal
+
+#dbt
+target/
+dbt_packages/
+logs/
