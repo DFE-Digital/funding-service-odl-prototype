@@ -2,7 +2,7 @@ with raw_csv as (
 
     select * 
     from read_csv(
-        'raw_data/scoped_providers_gias_2425.csv',
+        'UIFSM/2025_2026/data/scoped_providers_uifsm_2526.csv',
         header = true,
         escape = '"',
         strict_mode = false,
