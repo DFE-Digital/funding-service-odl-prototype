@@ -120,4 +120,6 @@ target/
 dbt_packages/
 logs/
 
+#data
 raw_data/
+data/ghs*
