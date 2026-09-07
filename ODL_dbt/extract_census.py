@@ -72,14 +72,18 @@ class CensusIngestion:
                 FSMeligible as fsm_eligible,
                 SchoolLunchTaken as school_lunch_taken
                 from catalog_30_bronze.tier1.censusseasonssa_masterview
-                WHERE AcademicYear IN (202122, 202425)
+                WHERE AcademicYear IN (202122, 202425,202526)
                 AND LA IN (201,202, 203)
                 AND (
+                        CensusDate BETWEEN DATE '2021-10-01' AND DATE '2021-10-31'
+                        OR
                         CensusDate BETWEEN DATE '2022-01-01' AND DATE '2022-01-31'
                         OR
                         CensusDate BETWEEN DATE '2025-01-01' AND DATE '2025-01-31'
                         OR
-                        CensusDate BETWEEN DATE '2021-10-01' AND DATE '2021-10-31'
+                        CensusDate BETWEEN DATE '2025-10-01' AND DATE '2025-10-31'
+                        OR 
+                        CensusDate BETWEEN DATE '2026-01-01' AND DATE '2026-01-31'
                     )
                 """)  # noqa: E501
 

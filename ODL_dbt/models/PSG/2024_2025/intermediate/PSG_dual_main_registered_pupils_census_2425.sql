@@ -20,7 +20,7 @@ select
   SUM(CASE WHEN c.enrol_status IN ('M') AND c.nc_year_actual = '7' THEN 1 ELSE 0 END) AS NCY_7,
   SUM(CASE WHEN c.enrol_status IN ('M') AND c.nc_year_actual = 'X' AND c.age_at_start_of_academic_year BETWEEN 5 AND 10 THEN 1 ELSE 0 END) AS NCY_X5to10
 
-from {{ref('stg_scoped_providers')}} sp
+from {{ref('psg_scoped_providers_2425')}} sp
 left join {{ref('stg_gias')}} ga on sp.urn = ga.urn
 inner join {{ref('stg_census')}} c on ga.urn=c.urn
 
