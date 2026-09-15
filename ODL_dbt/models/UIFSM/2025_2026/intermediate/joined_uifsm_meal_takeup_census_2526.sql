@@ -34,7 +34,7 @@ with joined as (
 )
 
 select
-     academic_year,
+    academic_year,
     urn,
     la_estab,
     ukprn,
