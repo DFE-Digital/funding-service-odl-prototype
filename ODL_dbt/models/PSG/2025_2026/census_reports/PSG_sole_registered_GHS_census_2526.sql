@@ -3,7 +3,7 @@
     g.ukprn,
     g.la_code as la_number,
     g.la_name,
-    sr.laestab,
+    sr.laestab as la_estab,
     g.establishment_name as provider_name,
     g.type_of_establishment_name,
     g.phase_of_education_name,
@@ -16,4 +16,4 @@
     FROM {{ref('psg_staging_sole_registered_GHS')}} sr
     INNER JOIN {{ref('stg_gias')}} g ON  sr.la=g.la_code and sr.estab=g.establishment_number
     WHERE year = 2026 and la_number in (201,202,203)
-ORDER BY sr.laestab
+ORDER BY la_estab

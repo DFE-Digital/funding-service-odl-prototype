@@ -4,7 +4,7 @@
     g.ukprn,
     g.la_code as la_number,
     g.la_name,
-    cast(concat(cast(dr.la as string), cast(dr.estab as string)) as integer) as laestab,
+    cast(concat(cast(dr.la as string), cast(dr.estab as string)) as integer) as la_estab,
     g.establishment_name as provider_name,
     g.type_of_establishment_name,
     g.phase_of_education_name,
@@ -17,6 +17,6 @@
     FROM {{ref('psg_staging_dual_registered_GHS')}} dr 
     INNER JOIN {{ref('stg_gias')}} g ON  dr.la=g.la_code and dr.estab=g.establishment_number
     WHERE year = 2026 and la_number in (201,202,203)
-ORDER BY laestab
+ORDER BY la_estab
 
 

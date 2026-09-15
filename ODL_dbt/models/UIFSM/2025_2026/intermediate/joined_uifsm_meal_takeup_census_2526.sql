@@ -27,14 +27,14 @@ with joined as (
         jan.FSM_NCY_X5 as FSM_NCY_X5_jan,
         jan.FSM_NCY_X6 as FSM_NCY_X6_jan
 
-    from {{ ref('UIFSM_meal_takeup_oct_2021_census') }} oct
-    full outer join {{ ref('UIFSM_meal_takeup_jan_2022_census') }} jan
+    from {{ ref('UIFSM_meal_takeup_oct_2025_census') }} oct
+    full outer join {{ ref('UIFSM_meal_takeup_jan_2026_census') }} jan
         on oct.urn = jan.urn
 
 )
 
 select
-    academic_year,
+     academic_year,
     urn,
     la_estab,
     ukprn,
@@ -43,18 +43,42 @@ select
     provider_name,
     type_of_establishment_name,
     phase_of_education_name,
-    -- max values of the 2 censuses - ensures providers have enough funding
-    greatest(coalesce(NCY_R, 0), coalesce(NCY_R_jan, 0)) as NCY_R,
-    greatest(coalesce(NCY_1, 0), coalesce(NCY_1_jan, 0)) as NCY_1,
-    greatest(coalesce(NCY_2, 0), coalesce(NCY_2_jan, 0)) as NCY_2,
-    greatest(coalesce(NCY_X4, 0), coalesce(NCY_X4_jan, 0)) as NCY_X4,
-    greatest(coalesce(NCY_X5, 0), coalesce(NCY_X5_jan, 0)) as NCY_X5,
-    greatest(coalesce(NCY_X6, 0), coalesce(NCY_X6_jan, 0)) as NCY_X6,
-    greatest(coalesce(FSM_NCY_R, 0), coalesce(FSM_NCY_R_jan, 0)) as FSM_NCY_R,
-    greatest(coalesce(FSM_NCY_1, 0), coalesce(FSM_NCY_1_jan, 0)) as FSM_NCY_1,
-    greatest(coalesce(FSM_NCY_2, 0), coalesce(FSM_NCY_2_jan, 0)) as FSM_NCY_2,
-    greatest(coalesce(FSM_NCY_X4, 0), coalesce(FSM_NCY_X4_jan, 0)) as FSM_NCY_X4,
-    greatest(coalesce(FSM_NCY_X5, 0), coalesce(FSM_NCY_X5_jan, 0)) as FSM_NCY_X5,
-    greatest(coalesce(FSM_NCY_X6, 0), coalesce(FSM_NCY_X6_jan, 0)) as FSM_NCY_X6
+    NCY_R,
+    FSM_NCY_R,
+    NCY_R - FSM_NCY_R as total_uifsm_meals_R,
+    NCY_1,
+    FSM_NCY_1,
+    NCY_1 - FSM_NCY_1 as total_uifsm_meals_1,
+    NCY_2,
+    FSM_NCY_2,  
+    NCY_2 - FSM_NCY_2 as total_uifsm_meals_2,
+    NCY_X4,
+    FSM_NCY_X4,
+    NCY_X4 - FSM_NCY_X4 as total_uifsm_meals_X4,
+    NCY_X5,     
+    FSM_NCY_X5,
+    NCY_X5 - FSM_NCY_X5 as total_uifsm_meals_X5,
+    NCY_X6,
+    FSM_NCY_X6,
+    NCY_X6 - FSM_NCY_X6 as total_uifsm_meals_X6,
 
+    NCY_R_jan,
+    FSM_NCY_R_jan,
+    NCY_R_jan - FSM_NCY_R_jan as total_uifsm_meals_R_jan,
+    NCY_1_jan,
+    FSM_NCY_1_jan,
+    NCY_1_jan - FSM_NCY_1_jan as total_uifsm_meals_1_jan,
+    NCY_2_jan,
+    FSM_NCY_2_jan,
+    NCY_2_jan - FSM_NCY_2_jan as total_uifsm_meals_2_jan,
+    NCY_X4_jan,
+    FSM_NCY_X4_jan,
+    NCY_X4_jan - FSM_NCY_X4_jan as total_uifsm_meals_X4_jan,
+    NCY_X5_jan,     
+    FSM_NCY_X5_jan,
+    NCY_X5_jan - FSM_NCY_X5_jan as total_uifsm_meals_X5_jan,
+    NCY_X6_jan,
+    FSM_NCY_X6_jan,
+    NCY_X6_jan - FSM_NCY_X6_jan as total_uifsm_meals_X6_jan
 from joined
+

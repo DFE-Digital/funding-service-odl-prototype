@@ -7,7 +7,7 @@ SELECT
     sr.ukprn,
     sr.la_number,
     sr.la_name,
-    sr.laestab,
+    sr.la_estab,
     sr.provider_name,
     sr.type_of_establishment_name,
     sr.phase_of_education_name,
@@ -18,5 +18,5 @@ SELECT
     sr.Age9_Total + dr.Age9_Total as Age9_Total,
     sr.Age10_Total + dr.Age10_Total as Age10_Total
 FROM {{ref('PSG_sole_registered_GHS_census_2526')}} sr
-INNER JOIN {{ref('PSG_dual_registered_GHS_census_2526')}} dr ON sr.laestab = dr.laestab
+INNER JOIN {{ref('PSG_dual_registered_GHS_census_2526')}} dr ON sr.la_estab = dr.la_estab
 ) select * from joined
