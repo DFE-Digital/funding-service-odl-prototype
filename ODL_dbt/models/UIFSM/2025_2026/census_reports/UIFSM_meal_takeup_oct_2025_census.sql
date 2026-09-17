@@ -1,10 +1,12 @@
 select 
-  ga.urn,
+  c.academic_year,
+  c.census_term,
+  sp.urn,
   c.la_estab,
-  ga.ukprn,
-  ga.la_code,
-  ga.la_name, 
-  ga.establishment_name,
+  sp.ukprn,
+  sp.la_number,
+  sp.la_name, 
+  sp.provider_name,
   ga.type_of_establishment_name,
   ga.phase_of_education_name,
 
@@ -21,20 +23,22 @@ select
   SUM(CASE WHEN c.enrol_status IN ('C','M','S','G','O','F') AND c.nc_year_actual = 'X' AND c.age_at_start_of_academic_year =5 AND c.fsm_eligible='1' AND c.school_lunch_taken=1 THEN 1 ELSE 0 END) AS FSM_NCY_X5,
   SUM(CASE WHEN c.enrol_status IN ('C','M','S','G','O','F') AND c.nc_year_actual = 'X' AND c.age_at_start_of_academic_year =6 AND c.fsm_eligible='1'AND c.school_lunch_taken=1 THEN 1 ELSE 0 END) AS FSM_NCY_X6
 
-from {{ref('stg_census')}} c
+from {{ref('uifsm_scoped_providers_2526')}} sp
+left join {{ref('stg_gias')}} ga on sp.urn = ga.urn
+inner join {{ref('stg_census')}} c on ga.urn=c.urn
 
-left join {{ref('stg_gias')}} ga on c.urn=ga.urn
-
-where c.academic_year = 202122 and c.census_date > DATE '2021-12-31' and c.census_date <= DATE '2022-01-31'
+where c.academic_year = 202526 and c.census_date > DATE '2025-09-30' and c.census_date <= DATE '2025-10-31'
 and ga.la_code !=207
 
 group by
-ga.urn,
+  c.academic_year,
+  c.census_term,
+  sp.urn,
   c.la_estab,
-  ga.ukprn,
-  ga.la_code,
-  ga.la_name, 
-  ga.establishment_name,
+  sp.ukprn,
+  sp.la_number,
+  sp.la_name, 
+  sp.provider_name,
   ga.type_of_establishment_name,
   ga.phase_of_education_name
 
