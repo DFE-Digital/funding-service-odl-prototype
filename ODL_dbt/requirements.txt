@@ -1,0 +1,14 @@
+#python 
+loguru
+pandas
+python-dotenv
+pyarrow
+
+# DBT
+duckdb
+dbt-duckdb
+databricks-sql-connector
+
+# Formattings
+ruff
+flake8

@@ -1,0 +1,11 @@
+name: fs-odl
+services:
+  sql-server:
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=LAw&shwh9P*ud*
+    ports:
+      - 1433:1433
+    container_name: sql1
+    hostname: sql1
+    image: mcr.microsoft.com/mssql/server:2022-latest
