@@ -1,9 +1,3 @@
-{# {{ config(
-    materialized='table',
-    post_hook="{{ add_key() }}"
-    ) 
-}} #}
-
 WITH GHS AS(
     SELECT
     '202425' as academic_year,
