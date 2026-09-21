@@ -1,16 +1,12 @@
-{% macro add_key(key_columns) %}
+{% macro add_key() %}
 
-    
-    {% set columns = key_columns %}
-
-    {% do log("columns=" ~ columns, info=True) %}
-
+    {% set columns = model.config.meta.get('key_columns', []) %}
     {% set col_list = columns | join(', ') %}
     {% set key_name = 'pk_' ~ this.identifier %}
 
     {% if target.type == 'duckdb' %}
         {% set sql %}
-            create index if not exists {{ key_name }}
+            create unique index if not exists {{ key_name }}
             on {{ this }} ({{ col_list }})
         {% endset %}
     {% elif target.type in ['mysql', 'dolt'] %}

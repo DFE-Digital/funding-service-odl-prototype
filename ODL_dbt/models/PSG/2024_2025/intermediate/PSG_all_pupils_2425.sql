@@ -1,8 +1,8 @@
-{{ config(
+{# {{ config(
     materialized='table',
-    post_hook="{{ add_key(['ukprn']) }}"
+    post_hook="{{ add_key() }}"
     ) 
-}}
+}} #}
 
 WITH GHS AS(
     SELECT

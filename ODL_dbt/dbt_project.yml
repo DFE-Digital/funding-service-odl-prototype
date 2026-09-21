@@ -37,6 +37,12 @@ models:
 
     PSG:
       "2024_2025":
+        +materialized: table
+        +meta:
+          key_columns:
+            - ukprn
+        +post-hook:
+          - "{{ add_key() }}"
         +schema: psg_2024_2025
 
       "2025_2026":
