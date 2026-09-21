@@ -1,3 +1,9 @@
+{{ config(
+    materialized='table',
+    post_hook="{{ add_key(['ukprn']) }}"
+    ) 
+}}
+
 WITH GHS AS(
     SELECT
     '202425' as academic_year,
