@@ -123,3 +123,7 @@ logs/
 #data
 raw_data/
 data/ghs*
+
+secrets.py
+.venv/
+__pycache__/
