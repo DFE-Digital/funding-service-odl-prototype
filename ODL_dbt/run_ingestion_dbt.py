@@ -13,7 +13,8 @@ def main():
     )
 
     subprocess.run(
-        ["dbt", "build"],
+        # single threaded to avoid race condition on index creation.
+        ["dbt", "build", "--threads", "1"],
         env=os.environ.copy(),
         check=True
     )
