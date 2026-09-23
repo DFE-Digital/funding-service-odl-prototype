@@ -125,5 +125,6 @@ raw_data/
 data/ghs*
 
 secrets.py
+my_secrets.py
 .venv/
 __pycache__/

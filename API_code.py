@@ -1,4 +1,4 @@
-from secrets import DATABRICKS_HOST, TOKEN, WAREHOUSE_ID
+from my_secrets import DATABRICKS_HOST, TOKEN, WAREHOUSE_ID
 import requests
 import pandas as pd
 #test with GP off!
@@ -12,26 +12,27 @@ class DatabricksAPI:
         self.statements_general = '/api/2.0/sql/statements'
         self.jobs_general = '/api/2.1/jobs/'
         self.statement_id = ''
-        self.df = pd.DataFrame({'Endpoint_name': ['data', 'statement_status', 'statement_cancel',
-                                                  'trigger', 'adhoc_task',
-                                                  'job_cancel', 'job_status', 'output',
+        self.df = pd.DataFrame({'Endpoint_name': ['data', 'statement_status',
+                                                  'statement_cancel',
+                                                  'trigger', 'job_cancel',
+                                                  'job_status', 'output',
                                                   'list'],
                                 'API': ['Statement', 'Statement', 'Statement',
-                                        'Job', 'Job', 'Job', 'Job', 'Job',
+                                        'Job', 'Job', 'Job', 'Job',
                                         'Job'],
                                 'Method': ['POST', 'GET', 'POST', 'POST',
-                                           'POST', 'POST', 'GET', 'GET',
+                                           'POST', 'GET', 'GET',
                                            'GET'],
                                 'Suffix': ['', f"/{self.statement_id}",
                                              f"/{self.statement_id}/cancel",
-                                             '/run-now', 'runs/submit',
+                                             '/run-now',
                                              '/runs/cancel', '/runs/get',
                                              '/runs/get-output',
                                              '/list'],
                                 'Payload': [["warehouse_id", "statement"],
                                             [],
                                             [],
-                                            ["job_id", "job_params"],
+                                            ["job_id", "job_parameters"],
                                             ["run_id"],
                                             ["run_id"],
                                             ["run_id"],
@@ -56,22 +57,22 @@ class DatabricksAPI:
         suffix = self.df.loc['Endpoint_name', 'Suffix']
         return prefix + suffix
 
-    def payload(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_params={}, run_id='', limit=10):
+    def payload(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
         payload_dict =  {"warehouse_id": self.warehouse_id,
                         "statement": sql,
                         "job_id": job_id,
-                        "job_params": job_params,
+                        "job_parameters": job_parameters,
                         "run_id": run_id,
                         "limit": limit,
                         "wait-timeout": timeout,
                         "format": "JSON_ARRAY"}
         return {key: payload_dict[key] for key in self.df.loc["Endpoint_name", "Payload"]}
 
-    def call(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_params={}, run_id='', limit=10):
+    def call(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
         url = self.endpoint(endpoint_name, statement_id)
         method = self.df.loc[endpoint_name, 'Method']
         headers = self.df.loc[endpoint_name, 'Headers']
-        payload = self.payload(endpoint_name, sql, timeout, statement_id, job_id, job_params, run_id, limit)
+        payload = self.payload(endpoint_name, sql, timeout, statement_id, job_id, job_parameters, run_id, limit)
         if method == 'POST':
             response = requests.post(url, headers=headers, json=payload)
         else:
