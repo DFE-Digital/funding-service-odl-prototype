@@ -54,11 +54,11 @@ class DatabricksAPI:
         self.statement_id = statement_id
         prefix = self.host + general_choice[self.df.loc[endpoint_name,
                                                         'API']]
-        suffix = self.df.loc['Endpoint_name', 'Suffix']
+        suffix = self.df.loc[endpoint_name, 'Suffix']
         return prefix + suffix
 
     def payload(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
-        payload_dict =  {"warehouse_id": self.warehouse_id,
+        payload_dict = {"warehouse_id": self.warehouse_id,
                         "statement": sql,
                         "job_id": job_id,
                         "job_parameters": job_parameters,
@@ -66,7 +66,7 @@ class DatabricksAPI:
                         "limit": limit,
                         "wait-timeout": timeout,
                         "format": "JSON_ARRAY"}
-        return {key: payload_dict[key] for key in self.df.loc["Endpoint_name", "Payload"]}
+        return {key: payload_dict[key] for key in self.df.loc[endpoint_name, "Payload"]}
 
     def call(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
         url = self.endpoint(endpoint_name, statement_id)
@@ -78,7 +78,7 @@ class DatabricksAPI:
         else:
             response = requests.get(url, headers=headers, params=payload)
         response.raise_for_status()
-        return response.json()
+        print(response.json())
 
 
 api = DatabricksAPI()
