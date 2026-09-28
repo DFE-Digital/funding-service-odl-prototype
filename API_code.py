@@ -65,6 +65,7 @@ class DatabricksAPI:
                         "job_parameters": job_parameters,
                         "run_id": run_id,
                         "limit": limit,
+                        #Haven't got the below two in my payload column in the df instance attribute?
                         "wait-timeout": timeout,
                         "format": "JSON_ARRAY"}
         return {key: payload_dict[key] for key in self.df.loc[endpoint_name, "Payload"]}
@@ -93,6 +94,24 @@ print(ep1)
 print('-------------GAP-------------')
 ep2 = api.get_data('statement_status', statement_id=ep1.get('statement_id'))
 print(ep2)
+print('-------------GAP-------------')
+ep3 = api.get_data('statement_cancel', statement_id=ep1.get('statement_id'))
+print(ep3)
+print('-------------GAP on to Jobs-------------')
+#ep4 = api.get_data('trigger', job_id='', job_parameters={})
+#print(ep4)
+print('-------------GAP-------------')
+#ep5 = api.get_data('job_cancel', run_id='')
+#print(ep5)
+print('-------------GAP-------------')
+#ep6 = api.get_data('job_status', run_id='')
+#print(ep6)
+print('-------------GAP-------------')
+#ep7 = api.get_data('output', run_id='')
+#print(ep7)
+print('-------------GAP-------------')
+#ep8 = api.get_data('list', limit=10)
+#print(ep8)
 
 
 #    def statements_specific(self, statement_id):
