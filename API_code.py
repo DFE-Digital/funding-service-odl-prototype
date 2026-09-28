@@ -11,8 +11,7 @@ class DatabricksAPI:
         self.warehouse_id = warehouse_id
         self.statements_general = '/api/2.0/sql/statements'
         self.jobs_general = '/api/2.1/jobs/'
-        self.statement_id = ''
-        self.df = pd.DataFrame({'Endpoint_name': ['data', 'statement_status',
+        self.df = pd.DataFrame({'Endpoint_name': ['submit_statement', 'statement_status',
                                                   'statement_cancel',
                                                   'trigger', 'job_cancel',
                                                   'job_status', 'output',
@@ -23,8 +22,8 @@ class DatabricksAPI:
                                 'Method': ['POST', 'GET', 'POST', 'POST',
                                            'POST', 'GET', 'GET',
                                            'GET'],
-                                'Suffix': ['', f"/{self.statement_id}",
-                                             f"/{self.statement_id}/cancel",
+                                'Suffix': ['', "/{statement_id}",
+                                             "/{statement_id}/cancel",
                                              '/run-now',
                                              '/runs/cancel', '/runs/get',
                                              '/runs/get-output',
@@ -51,10 +50,12 @@ class DatabricksAPI:
         # This would be easy to prevent but means having more code and it's harmless I think
         general_choice = {'Statement': self.statements_general,
                           'Job': self.jobs_general}
-        self.statement_id = statement_id
         prefix = self.host + general_choice[self.df.loc[endpoint_name,
                                                         'API']]
-        suffix = self.df.loc[endpoint_name, 'Suffix']
+
+        suffix_template = self.df.loc[endpoint_name, 'Suffix']
+        suffix = suffix_template.format(statement_id=statement_id)
+
         return prefix + suffix
 
     def payload(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
@@ -68,7 +69,7 @@ class DatabricksAPI:
                         "format": "JSON_ARRAY"}
         return {key: payload_dict[key] for key in self.df.loc[endpoint_name, "Payload"]}
 
-    def call(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
+    def get_data(self, endpoint_name, sql='', timeout="10s", statement_id='', job_id='', job_parameters={}, run_id='', limit=10):
         url = self.endpoint(endpoint_name, statement_id)
         method = self.df.loc[endpoint_name, 'Method']
         headers = self.df.loc[endpoint_name, 'Headers']
@@ -78,16 +79,20 @@ class DatabricksAPI:
         else:
             response = requests.get(url, headers=headers, params=payload)
         response.raise_for_status()
-        print(response.json())
+        return response.json()
 
 
 api = DatabricksAPI()
 
 
 sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
-                "LIMIT 10"
+                "LIMIT 5"
 
-api.call('data', sql=sql_statement)
+ep1 = api.get_data('submit_statement', sql=sql_statement)
+print(ep1)
+print('-------------GAP-------------')
+ep2 = api.get_data('statement_status', statement_id=ep1.get('statement_id'))
+print(ep2)
 
 
 #    def statements_specific(self, statement_id):
