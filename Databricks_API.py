@@ -1,6 +1,10 @@
 from my_secrets import DATABRICKS_HOST, TOKEN, WAREHOUSE_ID
 import requests
 import pandas as pd
+import time
+from loguru import logger
+import pyarrow.ipc as ipc
+from io import BytesIO
 
 class DatabricksStatementAPI:
     def __init__(self, sql_query):
@@ -21,6 +25,7 @@ class DatabricksStatementAPI:
                     "Content-Type": "application/json"}
 
     def post_for_statement_id(self):
+        logger.info("Posting SQL statement to Databricks API for execution.")
         url = self._get_url()
         headers = self._assemble_headers()
         body = {
@@ -30,26 +35,50 @@ class DatabricksStatementAPI:
             "format": "ARROW_STREAM",
             "wait_timeout": "0s"
         }
-        response = requests.post(url, headers=headers, json=body)
+        response = requests.post(url, headers=headers, json=body, timeout=30)
         response.raise_for_status()
 
         response_data = response.json()
         statement_id = response_data["statement_id"]
+
+        logger.info(f"Received statement_id: {statement_id}")
         return statement_id
 
     def get_data_from_statement_id(self, statement_id):
+        logger.info(f"Attempting to fetch data for statement_id: {statement_id}")
         url = self._get_url(statement_id=statement_id)
         headers = self._assemble_headers(method='GET')
         body = {}
-        return requests.get(url, headers=headers, params=body)
+        response = requests.get(url, headers=headers, params=body, timeout=30)
+        
+        json = response.json()
+        logger.info(f"Status is: {json['status']['state']}")
+        return json
+
+    def orchestrate(self):
+        statement_id = self.post_for_statement_id()
+
+        state = "PENDING"
+        while state not in ("SUCCEEDED", "FAILED", "CANCELED"):
+            result = self.get_data_from_statement_id(statement_id=statement_id)
+            state = result["status"]["state"]
+
+            if state == "SUCCEEDED":
+                return result["result"]
+            if state in ("FAILED", "CANCELED"):
+                raise Exception(f"QUERY {state}: {result['status'].get('error message', 'No error message provided')}")
+
+            time.sleep(1)
+            
 
 
-    def get_data(self):
-        pass
+
 
 
 sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
                 "LIMIT 5"
 
-x = DatabricksStatementAPI(sql_statement)
-print(x.post_sql_query())
+setup_request = DatabricksStatementAPI(sql_statement)
+run_request = setup_request.orchestrate()
+print(run_request)
+
