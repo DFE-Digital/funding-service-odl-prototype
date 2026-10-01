@@ -55,16 +55,47 @@ class DatabricksStatementAPI:
         logger.info(f"Status is: {json['status']['state']}")
         return json
 
-    def orchestrate(self):
+    def download_from_external_link(self, link, output_format):
+        logger.info(f"Attempting to download data from external link: {link}")
+        get_link = requests.get(link, timeout=30)
+        get_link.raise_for_status()
+        
+        reader = ipc.open_stream(BytesIO(get_link.content))
+        table = reader.read_all()
+        df = table.to_pandas()
+        logger.info(f"Downloaded data for link: {link}")
+        print(df.head())
+        
+        if output_format == "DataFrame":
+            return df
+        else:
+            dict_form = df.to_dict(orient="records")
+            logger.info("Converted data to dictionary format")
+            print(dict_form)
+            return dict_form
+
+    def orchestrate(self, output_format="DataFrame"):
         statement_id = self.post_for_statement_id()
 
         state = "PENDING"
+        start_time = time.time()
         while state not in ("SUCCEEDED", "FAILED", "CANCELED"):
+
+            if time.time() - start_time > 300:
+                raise TimeoutError("The request timed out after 5 minutes.")
+
             result = self.get_data_from_statement_id(statement_id=statement_id)
             state = result["status"]["state"]
 
             if state == "SUCCEEDED":
-                return result["result"]
+                success_results = result["result"]
+                print(success_results)
+
+                link = success_results["external_links"][0]["external_link"]
+                print(link)
+
+                self.download_from_external_link(link, output_format=output_format)
+
             if state in ("FAILED", "CANCELED"):
                 raise Exception(f"QUERY {state}: {result['status'].get('error message', 'No error message provided')}")
 
@@ -79,6 +110,6 @@ sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
                 "LIMIT 5"
 
 setup_request = DatabricksStatementAPI(sql_statement)
-run_request = setup_request.orchestrate()
-print(run_request)
+run_request = setup_request.orchestrate(output_format="DataFrame")
+run_request
 
