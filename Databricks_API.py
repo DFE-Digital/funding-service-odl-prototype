@@ -10,21 +10,26 @@ REQUEST_TIMEOUT = 30
 QUERY_TIMEOUT = 300
 POLL_INTERVAL = 1
 
+TERMINAL_STATES = {"SUCCEEDED", "FAILED", "CANCELED"}
+
 class DatabricksStatementAPI:
-    def __init__(self):
+    def __init__(self, host, token, warehouse_id):
+        self.host = host
+        self.token = token
+        self.warehouse_id = warehouse_id
+
         self.session = requests.Session()
-        self.session.headers.update({"Authorization": f"Bearer {TOKEN}"})
+        self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def _get_url(self, cancel_endpoint=False, statement_id=''):
-        base = f"{DATABRICKS_HOST}/api/2.0/sql/statements/{statement_id}"
+        base = f"{self.host}/api/2.0/sql/statements/{statement_id}"
         return f"{base}/cancel" if cancel_endpoint else base
 
     def post_for_statement_id(self, sql_query):
         logger.info("Posting SQL statement to Databricks API for execution.")
         url = self._get_url()
-        #headers = self._assemble_headers()
         body = {
-            "warehouse_id": WAREHOUSE_ID,
+            "warehouse_id": self.warehouse_id,
             "statement": sql_query,
             "disposition": "EXTERNAL_LINKS",
             "format": "ARROW_STREAM",
@@ -34,7 +39,10 @@ class DatabricksStatementAPI:
         response.raise_for_status()
 
         response_data = response.json()
-        statement_id = response_data["statement_id"]
+        statement_id = response_data.get("statement_id")
+
+        if not statement_id:
+            raise ValueError("No statement_id returned from Databricks API")
 
         logger.info(f"Received statement_id: {statement_id}")
         return statement_id
@@ -46,7 +54,8 @@ class DatabricksStatementAPI:
         response.raise_for_status()
 
         response_json = response.json()
-        logger.info(f"Status is: {response_json['status']['state']}")
+        logger.info(f"Status is: {response_json.get('status', {}).get('state'
+                                                                      )}")
         return response_json
 
     def cancel_statement(self, statement_id):
@@ -59,7 +68,7 @@ class DatabricksStatementAPI:
         logger.info(f"Waiting for completion of statement_id: {statement_id}")
         state = "PENDING"
         start_time = time.monotonic()
-        while state not in ("SUCCEEDED", "FAILED", "CANCELED"):
+        while state not in TERMINAL_STATES:
             if time.monotonic() - start_time > QUERY_TIMEOUT:
                 self.cancel_statement(statement_id)
                 raise TimeoutError("The request timed out after 5 minutes.")
@@ -74,7 +83,7 @@ class DatabricksStatementAPI:
                           .get("error", {})
                           .get("message", "No error message provided")
                 )
-                raise Exception(f"QUERY {state}: {error}")
+                raise RuntimeError(f"QUERY {state}: {error}")
 
             if state == "SUCCEEDED":
                 logger.success(f"Statement {statement_id} succeeded.")
@@ -91,7 +100,6 @@ class DatabricksStatementAPI:
         table = reader.read_all()
         df = table.to_pandas()
         logger.success(f"Downloaded data for link: {link}")
-        logger.debug(df.head())
 
         return df
 
@@ -99,27 +107,31 @@ class DatabricksStatementAPI:
         success_results = result.get("result", {})
         logger.debug(success_results)
         
-        link_data = []
-        for link in success_results.get("external_links", []):
-            logger.debug(link)
-            link_data.append(self.download_from_external_link(
-                link["external_link"]))
+        link_data = [self.download_from_external_link(link["external_link"])
+                     for link in success_results.get("external_links", [])]
         
         if not link_data:
             raise ValueError(
                             "Query succeeded but returned no external links."
                             )
         
-        concatenated_df = pd.concat(link_data, ignore_index=True)
-        logger.debug(concatenated_df.head())
+        concatenated_df = pd.concat(link_data, ignore_index=True) if len(
+            link_data) > 1 else link_data[0]
         
         if output_format == "DataFrame":
-           return concatenated_df
-        else:
+            return concatenated_df
+
+        if output_format == "JSON":
             return concatenated_df.to_dict(orient="records")
+
+        raise ValueError("output_format must be 'DataFrame' or 'JSON'")
         
 
     def orchestrate(self, sql_query, output_format="DataFrame"):
+        """
+        Execute a Databricks SQL query and return the result
+        as either a pandas DataFrame or JSON records.
+        """
         statement_id = self.post_for_statement_id(sql_query)
 
         result = self.poll_to_completion(statement_id=statement_id)
@@ -127,7 +139,7 @@ class DatabricksStatementAPI:
         logger.debug(result)
 
         return self.download_from_all_external_links(result=result,
-                                              output_format="DataFrame")
+                                        output_format=output_format)
 
 
 
@@ -137,5 +149,5 @@ class DatabricksStatementAPI:
 sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
                 "LIMIT 5"
 
-api = DatabricksStatementAPI()
+api = DatabricksStatementAPI(host=DATABRICKS_HOST, token=TOKEN, warehouse_id=WAREHOUSE_ID)
 api.orchestrate(sql_query=sql_statement, output_format="DataFrame")
