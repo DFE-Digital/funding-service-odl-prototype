@@ -12,6 +12,7 @@ POLL_INTERVAL = 1
 
 TERMINAL_STATES = {"SUCCEEDED", "FAILED", "CANCELED"}
 
+
 class DatabricksStatementAPI:
     def __init__(self, host, token, warehouse_id):
         self.host = host
@@ -48,7 +49,8 @@ class DatabricksStatementAPI:
         return statement_id
 
     def get_data_from_statement_id(self, statement_id):
-        logger.info(f"Attempting to fetch data for statement_id: {statement_id}")
+        logger.info(f"Attempting to fetch data for statement_id: {statement_id
+                                                                  }")
         url = self._get_url(statement_id=statement_id)
         response = self.session.get(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
@@ -103,21 +105,22 @@ class DatabricksStatementAPI:
 
         return df
 
-    def download_from_all_external_links(self, result, output_format="DataFrame"):
+    def download_all_external_links(self, result,
+                                    output_format="DataFrame"):
         success_results = result.get("result", {})
         logger.debug(success_results)
-        
+
         link_data = [self.download_from_external_link(link["external_link"])
                      for link in success_results.get("external_links", [])]
-        
+
         if not link_data:
             raise ValueError(
                             "Query succeeded but returned no external links."
                             )
-        
+
         concatenated_df = pd.concat(link_data, ignore_index=True) if len(
             link_data) > 1 else link_data[0]
-        
+
         if output_format == "DataFrame":
             return concatenated_df
 
@@ -125,7 +128,6 @@ class DatabricksStatementAPI:
             return concatenated_df.to_dict(orient="records")
 
         raise ValueError("output_format must be 'DataFrame' or 'JSON'")
-        
 
     def orchestrate(self, sql_query, output_format="DataFrame"):
         """
@@ -138,16 +140,13 @@ class DatabricksStatementAPI:
 
         logger.debug(result)
 
-        return self.download_from_all_external_links(result=result,
-                                        output_format=output_format)
-
-
-
-
+        return self.download_all_external_links(result=result,
+                                                output_format=output_format)
 
 
 sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
                 "LIMIT 5"
 
-api = DatabricksStatementAPI(host=DATABRICKS_HOST, token=TOKEN, warehouse_id=WAREHOUSE_ID)
+api = DatabricksStatementAPI(host=DATABRICKS_HOST, token=TOKEN,
+                             warehouse_id=WAREHOUSE_ID)
 api.orchestrate(sql_query=sql_statement, output_format="DataFrame")

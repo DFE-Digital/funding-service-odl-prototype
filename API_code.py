@@ -1,7 +1,7 @@
 from my_secrets import DATABRICKS_HOST, TOKEN, WAREHOUSE_ID
 import requests
 import pandas as pd
-#test with GP off!
+
 
 class DatabricksAPI:
     def __init__(self, host=DATABRICKS_HOST, token=TOKEN,
