@@ -129,3 +129,4 @@ my_secrets.py
 .venv/
 __pycache__/
 image (8).png
+.env
