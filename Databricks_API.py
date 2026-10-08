@@ -1,10 +1,18 @@
-from my_secrets import DATABRICKS_HOST, TOKEN, WAREHOUSE_ID
+import os
+from dotenv import load_dotenv
 import requests
 import pandas as pd
 import time
 from loguru import logger
 import pyarrow.ipc as ipc
 from io import BytesIO
+
+
+load_dotenv()  # Load environment variables from .env file
+
+DATABRICKS_HOST = os.getenv("DATABRICKS_HOST")
+TOKEN = os.getenv("TOKEN")
+WAREHOUSE_ID = os.getenv("WAREHOUSE_ID")
 
 REQUEST_TIMEOUT = 30
 QUERY_TIMEOUT = 300
