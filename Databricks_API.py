@@ -30,11 +30,11 @@ class DatabricksStatementAPI:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
-    def _get_url(self, cancel_endpoint=False, statement_id=''):
+    def _get_url(self, cancel_endpoint=False, statement_id='') -> str:
         base = f"{self.host}/api/2.0/sql/statements/{statement_id}"
         return f"{base}/cancel" if cancel_endpoint else base
 
-    def post_for_statement_id(self, sql_query):
+    def post_for_statement_id(self, sql_query) -> str:
         logger.info("Posting SQL statement to Databricks API for execution.")
         url = self._get_url()
         body = {
@@ -56,7 +56,7 @@ class DatabricksStatementAPI:
         logger.info(f"Received statement_id: {statement_id}")
         return statement_id
 
-    def get_data_from_statement_id(self, statement_id):
+    def get_data_from_statement_id(self, statement_id) -> dict:
         logger.info(f"Attempting to fetch data for statement_id: {statement_id
                                                                   }")
         url = self._get_url(statement_id=statement_id)
@@ -68,13 +68,13 @@ class DatabricksStatementAPI:
                                                                       )}")
         return response_json
 
-    def cancel_statement(self, statement_id):
+    def cancel_statement(self, statement_id) -> None:
         logger.info(f"Attempting to cancel statement_id: {statement_id}")
         url = self._get_url(cancel_endpoint=True, statement_id=statement_id)
         response = self.session.post(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
 
-    def poll_to_completion(self, statement_id):
+    def poll_to_completion(self, statement_id) -> dict:
         logger.info(f"Waiting for completion of statement_id: {statement_id}")
         state = "PENDING"
         start_time = time.monotonic()
@@ -101,7 +101,7 @@ class DatabricksStatementAPI:
 
             time.sleep(POLL_INTERVAL)
 
-    def download_from_external_link(self, link):
+    def download_from_external_link(self, link) -> pd.DataFrame:
         logger.info(f"Attempting to download data from external link: {link}")
         get_link = requests.get(link, timeout=REQUEST_TIMEOUT)
         get_link.raise_for_status()
@@ -114,7 +114,7 @@ class DatabricksStatementAPI:
         return df
 
     def download_all_external_links(self, result,
-                                    output_format="DataFrame"):
+                                    output_format="DataFrame") -> pd.DataFrame | dict:
         success_results = result.get("result", {})
         logger.debug(success_results)
 
@@ -137,7 +137,7 @@ class DatabricksStatementAPI:
 
         raise ValueError("output_format must be 'DataFrame' or 'JSON'")
 
-    def orchestrate(self, sql_query, output_format="DataFrame"):
+    def orchestrate(self, sql_query, output_format="DataFrame") -> pd.DataFrame | dict:
         """
         Execute a Databricks SQL query and return the result
         as either a pandas DataFrame or JSON records.
@@ -152,9 +152,14 @@ class DatabricksStatementAPI:
                                                 output_format=output_format)
 
 
-sql_statement = "SELECT * from catalog_30_bronze.pims.vw_pims_modifieddata " \
-                "LIMIT 5"
+def main():
+    sql_statement = "SELECT * from catalog_30_bronze.pims." \
+                    "vw_pims_modifieddata LIMIT 5"
+    api = DatabricksStatementAPI(host=DATABRICKS_HOST, token=TOKEN,
+                                 warehouse_id=WAREHOUSE_ID)
+    return api.orchestrate(sql_query=sql_statement, output_format="DataFrame")
 
-api = DatabricksStatementAPI(host=DATABRICKS_HOST, token=TOKEN,
-                             warehouse_id=WAREHOUSE_ID)
-api.orchestrate(sql_query=sql_statement, output_format="DataFrame")
+
+if __name__ == "__main__":
+    output = main()
+    print(output)
