@@ -1,17 +1,19 @@
 import os
-from dotenv import load_dotenv
-import requests
-import pandas as pd
 import time
-from loguru import logger
-import pyarrow.ipc as ipc
 from io import BytesIO
-from requests.exceptions import (
-    ConnectionError, 
-    ReadTimeout, 
-    Timeout, 
-    HTTPError)
+
+import pandas as pd
+import pyarrow.ipc as ipc
+import requests
+from dotenv import load_dotenv
+from loguru import logger
 from requests import Response
+from requests.exceptions import (
+    ConnectionError,
+    HTTPError,
+    ReadTimeout,
+    Timeout,
+)
 
 
 load_dotenv()  # Load environment variables from .env file
@@ -43,7 +45,8 @@ class DatabricksStatementAPI:
         base = f"{self.host}/api/2.0/sql/statements/{statement_id}"
         return f"{base}/cancel" if cancel_endpoint else base
 
-    def _make_request(self, external_request, request_type, url, **kwargs) -> Response:
+    def _make_request(self, external_request, request_type, url,
+                      **kwargs) -> Response:
         request_type = request_type.upper()
         for attempt in range(1, MAX_RETRIES + 1):
             try:
@@ -57,7 +60,8 @@ class DatabricksStatementAPI:
                                                     timeout=REQUEST_TIMEOUT,
                                                     **kwargs)
                     else:
-                        raise ValueError("request_type must be 'POST' or 'GET'")
+                        raise ValueError("request_type must be 'POST' or "
+                                         "'GET'")
                 elif external_request is True:
                     if request_type == "POST":
                         response = requests.post(url=url,
@@ -108,7 +112,8 @@ class DatabricksStatementAPI:
             "wait_timeout": "0s"
         }
 
-        response = self._make_request(external_request=False, request_type="POST", url=url, json=body)
+        response = self._make_request(external_request=False,
+                                      request_type="POST", url=url, json=body)
 
         response_data = response.json()
         statement_id = response_data.get("statement_id")
@@ -124,7 +129,8 @@ class DatabricksStatementAPI:
                                                                   }")
         url = self._get_url(statement_id=statement_id)
 
-        response = self._make_request(external_request=False, request_type="GET", url=url)
+        response = self._make_request(external_request=False,
+                                      request_type="GET", url=url)
 
         response_json = response.json()
         logger.info(f"Status is: {response_json.get('status', {}).get('state'
@@ -135,7 +141,8 @@ class DatabricksStatementAPI:
         logger.info(f"Attempting to cancel statement_id: {statement_id}")
         url = self._get_url(cancel_endpoint=True, statement_id=statement_id)
 
-        self._make_request(external_request=False, request_type="POST", url=url)
+        self._make_request(external_request=False, request_type="POST",
+                           url=url)
 
     def poll_to_completion(self, statement_id) -> dict:
         logger.info(f"Waiting for completion of statement_id: {statement_id}")
@@ -167,7 +174,8 @@ class DatabricksStatementAPI:
     def download_from_external_link(self, link) -> pd.DataFrame:
         logger.info(f"Attempting to download data from external link: {link}")
 
-        get_link = self._make_request(external_request=True, request_type="GET", url=link)
+        get_link = self._make_request(external_request=True,
+                                      request_type="GET", url=link)
 
         reader = ipc.open_stream(BytesIO(get_link.content))
         table = reader.read_all()
@@ -176,8 +184,9 @@ class DatabricksStatementAPI:
 
         return df
 
-    def download_all_external_links(self, result,
-                                    output_format="DataFrame") -> pd.DataFrame | list[dict]:
+    def download_all_external_links(
+            self, result,
+            output_format="DataFrame") -> pd.DataFrame | list[dict]:
         success_results = result.get("result", {})
         logger.debug(success_results)
 
@@ -192,10 +201,8 @@ class DatabricksStatementAPI:
         concatenated_df = pd.concat(link_data, ignore_index=True) if len(
             link_data) > 1 else link_data[0]
 
-        logger.info(
-        f"Retrieved {len(concatenated_df):,} rows "
-        f"across {len(link_data)} external link(s)"
-        )
+        logger.info(f"Retrieved {len(concatenated_df):,} rows "
+                    f"across {len(link_data)} external link(s)")
 
         if output_format == "DataFrame":
             return concatenated_df
@@ -205,7 +212,8 @@ class DatabricksStatementAPI:
 
         raise ValueError("output_format must be 'DataFrame' or 'JSON'")
 
-    def orchestrate(self, sql_query, output_format="DataFrame") -> pd.DataFrame | list[dict]:
+    def orchestrate(self, sql_query,
+                    output_format="DataFrame") -> pd.DataFrame | list[dict]:
         """
         Execute a Databricks SQL query and return the result
         as either a pandas DataFrame or JSON records.
